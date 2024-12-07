@@ -12,3 +12,6 @@ old_evaluation.py
 data
 models*.pkl
 *.csv
+models/best_model_random forest.pkl
+data/processed/data_part1.csv
+data/processed/data_part2.csv
