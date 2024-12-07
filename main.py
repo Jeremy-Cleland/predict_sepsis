@@ -639,7 +639,8 @@ def main():
         logger.info("Applying SMOTEENN to training data")
 
         # Configure SMOTE with the correct k_neighbors parameter
-        smote = SMOTE(sampling_strategy=0.3, random_state=42, k_neighbors=5)
+        # ! change back to 0.3
+        smote = SMOTE(sampling_strategy=0.1, random_state=42, k_neighbors=5)
 
         # Configure ENN
         enn = EditedNearestNeighbours(n_jobs=-1)

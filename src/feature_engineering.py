@@ -1,4 +1,14 @@
-# src/feature_engineering.py
+"""Feature engineering module for preprocessing medical data.
+
+This module provides functions for preprocessing medical dataset features including:
+- Dropping redundant and null columns
+- Imputing missing values
+- Encoding categorical variables
+- Applying transformations (log, scaling)
+
+The module is designed to work with patient medical data containing vital signs
+and lab test results.
+"""
 
 import logging
 
@@ -8,20 +18,31 @@ from sklearn.experimental import enable_iterative_imputer  # noqa
 from sklearn.impute import IterativeImputer
 from sklearn.preprocessing import RobustScaler, StandardScaler
 
-# from src.utils import setup_logger
-
 
 def drop_columns(df):
-    """Drop specified redundant columns except Unit1 and Unit2."""
+    """Drop specified redundant columns from the dataset.
+
+    Args:
+        df (pd.DataFrame): Input dataframe containing medical data
+
+    Returns:
+        pd.DataFrame: Dataframe with redundant columns removed
+
+    Note:
+        Preserves Unit1 and Unit2 columns while removing other specified columns
+    """
     columns_drop = {
-        "Unnamed: 0",
+        "Unnamed: 0",  # Index column
+        # Vital signs that are derived or redundant
         "SBP",
         "DBP",
         "EtCO2",
+        # Blood gas and chemistry redundancies
         "BaseExcess",
         "HCO3",
         "pH",
         "PaCO2",
+        # Duplicated or highly correlated lab values
         "Alkalinephos",
         "Calcium",
         "Magnesium",
@@ -35,7 +56,19 @@ def drop_columns(df):
 
 
 def fill_missing_values(df):
-    """Impute missing values using IterativeImputer."""
+    """Impute missing values using iterative imputation (MICE algorithm).
+
+    Args:
+        df (pd.DataFrame): Input dataframe with missing values
+
+    Returns:
+        pd.DataFrame: Dataframe with imputed values
+
+    Note:
+        - Preserves categorical columns during imputation
+        - Uses mean initialization and 20 maximum iterations
+        - Maintains reproducibility with fixed random state
+    """
     # Create a copy of the dataframe
     df_copy = df.copy()
 
@@ -50,14 +83,17 @@ def fill_missing_values(df):
 
     # Initialize and fit the IterativeImputer
     imputer = IterativeImputer(
-        random_state=42, max_iter=20, initial_strategy="mean", skip_complete=True
+        random_state=42,  # Ensures reproducibility.
+        max_iter=30,  # Maximum number of iterations.
+        initial_strategy="mean",  # Initial imputation strategy.
+        skip_complete=True,  # Skips columns without missing values to save computation.
     )
 
     # Perform imputation on numerical columns
     imputed_numerical = pd.DataFrame(
-        imputer.fit_transform(numerical_data),
-        columns=numerical_columns,
-        index=df_copy.index,
+        imputer.fit_transform(numerical_data),  # Perform imputation.
+        columns=numerical_columns,  # Preserve original column names.
+        index=df_copy.index,  # Maintain original index.
     )
 
     # Combine the imputed numerical data with categorical data
@@ -105,27 +141,22 @@ def one_hot_encode_gender(df):
     return df
 
 
-# ! Old
-# def log_transform(df, columns):
-#     """Apply log transformation to specified columns."""
-#     for col in columns:
-#         df[col] = np.log(df[col] + 1)
-#     return df
-
-
-# ! New function
-# def log_transform(df, columns):
-#     """Apply log transformation to specified columns."""
-#     for col in columns:
-#         # Add small constant and handle negative values
-#         df[col] = np.log(df[col].clip(lower=1e-10) + 1)
-#     return df
-
-
 def log_transform(df, columns):
-    """Apply log transformation to specified columns, handling non-positive values."""
+    """Apply log transformation to handle skewed numeric features.
+
+    Args:
+        df (pd.DataFrame): Input dataframe
+        columns (list): List of column names to transform
+
+    Returns:
+        pd.DataFrame: Dataframe with log-transformed columns
+
+    Note:
+        Uses log(x + 1) transformation with minimum clipping at 1e-5
+        to handle zeros and small values
+    """
     for col in columns:
-        # Add small constant and handle negative values
+        # Clip values to prevent log(0) or log(negative)
         df[col] = np.log(df[col].clip(lower=1e-5) + 1)
     return df
 
@@ -145,7 +176,27 @@ def robust_scale(df, columns):
 
 
 def preprocess_data(df):
-    """Complete preprocessing pipeline."""
+    """Execute complete preprocessing pipeline for medical data.
+
+    Pipeline steps:
+    1. Drop redundant columns
+    2. Impute missing values using MICE
+    3. Drop specified null columns
+    4. One-hot encode gender
+    5. Apply log transformation to skewed features
+    6. Apply robust scaling to numeric features
+    7. Handle remaining NaN values
+    8. Standardize column names
+
+    Args:
+        df (pd.DataFrame): Raw input dataframe
+
+    Returns:
+        pd.DataFrame: Fully preprocessed dataframe ready for modeling
+
+    Note:
+        Logs progress at each major preprocessing step
+    """
     logging.info("Starting preprocessing")
 
     df = drop_columns(df)
