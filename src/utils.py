@@ -142,8 +142,6 @@ import seaborn as sns
 from scipy import stats
 from sklearn.preprocessing import StandardScaler
 
-# Removed: from .feature_engineering import preprocess_data  # No longer needed
-
 
 def setup_logger(log_file="logs/sepsis_prediction.log"):
     """Set up the logger with proper configuration to avoid double logging."""
