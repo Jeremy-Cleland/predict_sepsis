@@ -4,3 +4,7 @@ __pycache__/
 .env
 venv/
 *.log
+
+lastrun.md
+record.md
+old_evaluation.py
