@@ -13,9 +13,9 @@ sepsis_prediction/
 │   ├── raw/
 │   │   └── Dataset.csv
 │   ├── processed/
-│   │   ├── data_part1.csv
-│   │   └── data_part2.csv
-│   └── external/
+│   │   ├── train_data.csv
+│   │   ├── test_data.csv
+│   │   └── val_data.csv
 │
 ├── notebooks/
 │   └── EDA.ipynb

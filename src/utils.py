@@ -14,29 +14,38 @@ from sklearn.preprocessing import StandardScaler
 
 
 def setup_logger(log_file="logs/sepsis_prediction.log"):
-    """Set up the logger."""
+    """Set up the logger with proper configuration to avoid double logging."""
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
 
+    # Get the logger
     logger = logging.getLogger("SepsisPredictionLogger")
-    logger.setLevel(logging.DEBUG)
 
-    # Avoid adding multiple handlers if the logger already has handlers
-    if not logger.handlers:
-        # Create handlers
-        c_handler = logging.StreamHandler()
-        f_handler = logging.FileHandler(log_file)
-        c_handler.setLevel(logging.INFO)
-        f_handler.setLevel(logging.DEBUG)
+    # Clear any existing handlers
+    if logger.handlers:
+        logger.handlers.clear()
 
-        # Create formatters and add to handlers
-        c_format = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        f_format = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        c_handler.setFormatter(c_format)
-        f_handler.setFormatter(f_format)
+    # Prevent the logger from propagating messages to the root logger
+    logger.propagate = False
 
-        # Add handlers to the logger
-        logger.addHandler(c_handler)
-        logger.addHandler(f_handler)
+    # Set the logging level
+    logger.setLevel(logging.INFO)
+
+    # Create handlers
+    c_handler = logging.StreamHandler()
+    f_handler = logging.FileHandler(log_file)
+
+    # Set levels
+    c_handler.setLevel(logging.INFO)
+    f_handler.setLevel(logging.DEBUG)
+
+    # Create formatters
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    c_handler.setFormatter(formatter)
+    f_handler.setFormatter(formatter)
+
+    # Add handlers to the logger
+    logger.addHandler(c_handler)
+    logger.addHandler(f_handler)
 
     return logger
 

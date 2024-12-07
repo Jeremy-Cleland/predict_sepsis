@@ -1,14 +1,34 @@
+# src/data_processing.py
+
 import logging
 import os
 from typing import Tuple
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
 
 
 def load_data(filepath: str) -> pd.DataFrame:
     """
     Load the dataset from a CSV file with error handling and validation.
+
+    Parameters:
+    -----------
+    filepath : str
+        Path to the CSV file
+
+    Returns:
+    --------
+    pd.DataFrame
+        Loaded and validated DataFrame
+
+    Raises:
+    -------
+    FileNotFoundError
+        If the specified file doesn't exist
+    ValueError
+        If the loaded data doesn't meet expected format
     """
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"Data file not found at: {filepath}")
@@ -22,8 +42,8 @@ def load_data(filepath: str) -> pd.DataFrame:
     if missing_columns:
         raise ValueError(f"Missing required columns: {missing_columns}")
 
-    # Convert Patient_ID to string - using inplace operation
-    df = df.assign(Patient_ID=df["Patient_ID"].astype(str))
+    # Convert Patient_ID to string to ensure consistent handling
+    df["Patient_ID"] = df["Patient_ID"].astype(str)
 
     # Basic data validation
     if df["SepsisLabel"].nunique() > 2:
@@ -41,7 +61,31 @@ def split_data(
     stratify_by_sepsis: bool = True,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
-    Split the combined data into training, validation, and testing datasets.
+    Split the combined data into training, validation, and testing datasets while keeping Patient_IDs together
+    and optionally stratifying by sepsis prevalence.
+
+    Parameters:
+    -----------
+    combined_df : pd.DataFrame
+        The input DataFrame containing patient data
+    train_size : float, default=0.7
+        The proportion of data to include in the training set
+    val_size : float, default=0.15
+        The proportion of data to include in the validation set
+    random_state : int, default=42
+        Random state for reproducibility
+    stratify_by_sepsis : bool, default=True
+        Whether to maintain similar sepsis prevalence across splits
+
+    Returns:
+    --------
+    Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
+        Training, validation, and testing datasets
+
+    Raises:
+    -------
+    ValueError
+        If input parameters are invalid or if data doesn't meet requirements
     """
     # Input validation
     if not 0 < train_size + val_size < 1:
@@ -49,9 +93,6 @@ def split_data(
 
     if not isinstance(combined_df, pd.DataFrame):
         raise ValueError("combined_df must be a pandas DataFrame")
-
-    # Ensure Patient_ID is string type before splitting
-    combined_df = combined_df.assign(Patient_ID=combined_df["Patient_ID"].astype(str))
 
     # Get unique Patient_IDs and their characteristics
     patient_stats = (
@@ -69,12 +110,13 @@ def split_data(
     np.random.seed(random_state)
 
     if stratify_by_sepsis:
-        # Split separately for sepsis and non-sepsis patients
+        # Split separately for sepsis and non-sepsis patients to maintain distribution
         sepsis_patients = patient_stats[patient_stats["SepsisLabel"] == 1]["Patient_ID"]
         non_sepsis_patients = patient_stats[patient_stats["SepsisLabel"] == 0][
             "Patient_ID"
         ]
 
+        # Function to split patient IDs while maintaining proportions
         def split_patient_ids(patient_ids):
             n_train = int(len(patient_ids) * train_size)
             n_val = int(len(patient_ids) * val_size)
@@ -95,7 +137,6 @@ def split_data(
         train_patients = np.concatenate([train_sepsis, train_non_sepsis])
         val_patients = np.concatenate([val_sepsis, val_non_sepsis])
         test_patients = np.concatenate([test_sepsis, test_non_sepsis])
-
     else:
         # Simple random split without stratification
         shuffled_patients = np.random.permutation(patient_stats["Patient_ID"])
@@ -106,7 +147,7 @@ def split_data(
         val_patients = shuffled_patients[n_train : n_train + n_val]
         test_patients = shuffled_patients[n_train + n_val :]
 
-    # Create the splits - using copy() to ensure we have independent DataFrames
+    # Create the splits
     df_train = combined_df[combined_df["Patient_ID"].isin(train_patients)].copy()
     df_val = combined_df[combined_df["Patient_ID"].isin(val_patients)].copy()
     df_test = combined_df[combined_df["Patient_ID"].isin(test_patients)].copy()
@@ -158,6 +199,27 @@ def load_processed_data(
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Load processed training, validation, and testing data with validation.
+
+    Parameters:
+    -----------
+    train_path : str
+        Path to training data CSV
+    val_path : str
+        Path to validation data CSV
+    test_path : str
+        Path to test data CSV
+
+    Returns:
+    --------
+    Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
+        Training, validation, and testing DataFrames
+
+    Raises:
+    -------
+    FileNotFoundError
+        If any of the specified files don't exist
+    ValueError
+        If the loaded data doesn't meet expected format
     """
     # Check file existence
     for path in [train_path, val_path, test_path]:
@@ -173,11 +235,9 @@ def load_processed_data(
     if not (set(df_train.columns) == set(df_val.columns) == set(df_test.columns)):
         raise ValueError("Column mismatch between datasets")
 
-    # Convert Patient_ID to string in all datasets using assign
-    dfs = [df_train, df_val, df_test]
-    for i in range(len(dfs)):
-        dfs[i] = dfs[i].assign(Patient_ID=dfs[i]["Patient_ID"].astype(str))
-    df_train, df_val, df_test = dfs
+    # Convert Patient_ID to string in all datasets
+    for df in [df_train, df_val, df_test]:
+        df["Patient_ID"] = df["Patient_ID"].astype(str)
 
     # Verify no patient overlap
     train_patients = set(df_train["Patient_ID"])
@@ -194,9 +254,49 @@ def load_processed_data(
     return df_train, df_val, df_test
 
 
+def get_data_ready(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Transform the dataframe into a format compatible with the model.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        Input DataFrame to process
+
+    Returns:
+    --------
+    pd.DataFrame
+        Processed DataFrame ready for model input
+
+    Notes:
+    ------
+    This is a wrapper function that calls the appropriate preprocessing
+    functions from feature_engineering module.
+    """
+    from .feature_engineering import preprocess_data
+
+    # Make a copy to avoid modifying the original
+    df = df.copy()
+
+    # Apply preprocessing
+    df = preprocess_data(df)
+
+    return df
+
+
 def validate_dataset(df: pd.DataFrame) -> None:
     """
     Validate the dataset format and content.
+
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        DataFrame to validate
+
+    Raises:
+    -------
+    ValueError
+        If the dataset doesn't meet the expected format
     """
     # Check required columns
     required_columns = ["Patient_ID", "Hour", "SepsisLabel"]

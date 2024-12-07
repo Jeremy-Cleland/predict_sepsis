@@ -1,7 +1,6 @@
 # src/__init__.py
 
 from .data_processing import (
-    get_data_ready,  # Ensure this is included
     load_data,
     load_processed_data,
     split_data,
@@ -22,7 +21,6 @@ __all__ = [
     "load_data",
     "split_data",
     "load_processed_data",
-    "get_data_ready",
     "preprocess_data",
     "train_random_forest",
     "train_naive_bayes",
