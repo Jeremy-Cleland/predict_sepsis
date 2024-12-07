@@ -8,11 +8,7 @@ from sklearn.experimental import enable_iterative_imputer  # noqa
 from sklearn.impute import IterativeImputer
 from sklearn.preprocessing import RobustScaler, StandardScaler
 
-# from .utils import (
-#     corr_matrix,
-#     diagnostic_plots,
-#     try_gaussian,
-# )  # Ensure utils are imported correctly
+# from src.utils import setup_logger
 
 
 def drop_columns(df):
@@ -38,15 +34,6 @@ def drop_columns(df):
     return df
 
 
-# def fill_missing_values(df):
-#     """Impute missing values using backfill and forward fill."""
-#     grouped_by_patient = df.groupby(
-#         "Patient_ID", group_keys=False
-#     )  # Added group_keys=False
-#     df = grouped_by_patient.apply(lambda x: x.bfill().ffill())
-#     return df
-
-
 def fill_missing_values(df):
     """Impute missing values using IterativeImputer."""
     # Create a copy of the dataframe
@@ -63,7 +50,7 @@ def fill_missing_values(df):
 
     # Initialize and fit the IterativeImputer
     imputer = IterativeImputer(
-        random_state=42, max_iter=15, initial_strategy="mean", skip_complete=True
+        random_state=42, max_iter=20, initial_strategy="mean", skip_complete=True
     )
 
     # Perform imputation on numerical columns
@@ -119,11 +106,11 @@ def one_hot_encode_gender(df):
 
 
 # ! Old
-def log_transform(df, columns):
-    """Apply log transformation to specified columns."""
-    for col in columns:
-        df[col] = np.log(df[col] + 1)
-    return df
+# def log_transform(df, columns):
+#     """Apply log transformation to specified columns."""
+#     for col in columns:
+#         df[col] = np.log(df[col] + 1)
+#     return df
 
 
 # ! New function
@@ -133,6 +120,14 @@ def log_transform(df, columns):
 #         # Add small constant and handle negative values
 #         df[col] = np.log(df[col].clip(lower=1e-10) + 1)
 #     return df
+
+
+def log_transform(df, columns):
+    """Apply log transformation to specified columns, handling non-positive values."""
+    for col in columns:
+        # Add small constant and handle negative values
+        df[col] = np.log(df[col].clip(lower=1e-5) + 1)
+    return df
 
 
 def standard_scale(df, columns):
