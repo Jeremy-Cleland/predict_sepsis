@@ -15,3 +15,6 @@ models*.pkl
 models/best_model_random forest.pkl
 data/processed/data_part1.csv
 data/processed/data_part2.csv
+data/processed/val_data.csv
+data/processed/test_data.csv
+models/best_model_xgboost.pkl
