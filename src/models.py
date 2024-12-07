@@ -1,12 +1,19 @@
 # src/models.py
 
-import logging
-
 import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+
+from src.logger_config import setup_logger
+
+# Initialize logger with default log level ("INFO") and JSON formatting enabled
+logger = setup_logger(
+    name="sepsis_prediction.models",
+    log_file="logs/models.log",
+    use_json=True,  # Enable JSON formatting
+)
 
 
 def train_random_forest(
@@ -15,6 +22,9 @@ def train_random_forest(
     """
     Train a Random Forest classifier with improved parameters.
     """
+    logger.info(
+        f"Training Random Forest with n_estimators={n_estimators}, max_depth={max_depth}"
+    )
     model = RandomForestClassifier(
         n_estimators=n_estimators,
         max_depth=max_depth,
@@ -26,6 +36,7 @@ def train_random_forest(
         min_samples_leaf=2,  # Prevent overfitting
     )
     model.fit(X_train, y_train)
+    logger.info("Random Forest training completed.")
     return model
 
 
@@ -33,10 +44,12 @@ def train_naive_bayes(X_train, y_train):
     """
     Train a Gaussian Naive Bayes classifier with default parameters.
     """
+    logger.info("Training Gaussian Naive Bayes")
     model = GaussianNB(
         var_smoothing=1e-9  # Default parameter
     )
     model.fit(X_train, y_train)
+    logger.info("Gaussian Naive Bayes training completed.")
     return model
 
 
@@ -44,6 +57,7 @@ def train_knn(X_train, y_train, n_neighbors=5):
     """
     Train a K-Nearest Neighbors classifier with improved parameters.
     """
+    logger.info(f"Training K-Nearest Neighbors with n_neighbors={n_neighbors}")
     model = KNeighborsClassifier(
         n_neighbors=n_neighbors,
         weights="distance",  # Weight points by distance
@@ -54,6 +68,7 @@ def train_knn(X_train, y_train, n_neighbors=5):
         metric="minkowski",  # Standard distance metric
     )
     model.fit(X_train, y_train)
+    logger.info("K-Nearest Neighbors training completed.")
     return model
 
 
@@ -61,6 +76,7 @@ def train_logistic_regression(X_train, y_train):
     """
     Train a Logistic Regression classifier with improved parameters.
     """
+    logger.info("Training Logistic Regression")
     model = LogisticRegression(
         max_iter=1000,
         C=1.0,  # Inverse of regularization strength
@@ -72,6 +88,7 @@ def train_logistic_regression(X_train, y_train):
         class_weight="balanced",  # Handle class imbalance
     )
     model.fit(X_train, y_train)
+    logger.info("Logistic Regression training completed.")
     return model
 
 
@@ -155,7 +172,7 @@ def train_xgboost(X_train, y_train, params=None, num_round=100, eval_set=None):
         return bst
 
     except Exception as e:
-        logging.error(f"Error in XGBoost training: {str(e)}")
+        logger.error(f"Error in XGBoost training: {str(e)}")
         raise
 
 
@@ -188,5 +205,5 @@ def predict_xgboost(bst, X_test):
         return (preds >= 0.5).astype(int)
 
     except Exception as e:
-        logging.error(f"Error in XGBoost prediction: {str(e)}")
+        logger.error(f"Error in XGBoost prediction: {str(e)}")
         raise

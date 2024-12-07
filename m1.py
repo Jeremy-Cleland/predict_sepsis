@@ -2,6 +2,7 @@
 
 import gc
 import json
+import logging
 import os
 from typing import Any, Tuple
 
@@ -21,7 +22,7 @@ from sklearn.preprocessing import StandardScaler
 from src import (
     evaluate_model,  # Import the updated unified evaluation function
     load_data,
-    preprocess_pipeline,
+    preprocess_data,
     split_data,
     train_logistic_regression,
 )
@@ -83,7 +84,7 @@ def train_and_evaluate_model(
 
 def main():
     # Set up logger
-
+    logger = setup_logger()
     logger.info("Starting Sepsis Prediction Pipeline")
 
     try:
@@ -103,11 +104,14 @@ def main():
             title_suffix="_before_resampling",
         )
 
-        # Step 2: Preprocess all datasets together
+        # Step 2: Preprocess all datasets using the new approach
         logger.info("Preprocessing all datasets")
-        df_train_processed, df_val_processed, df_test_processed = preprocess_pipeline(
-            train_df=df_train, val_df=df_val, test_df=df_test
-        )
+        # First preprocess training data and get fitted parameters
+        df_train_processed, fitted_params = preprocess_data(df_train, is_training=True)
+
+        # Then preprocess validation and test data using those parameters
+        df_val_processed = preprocess_data(df_val, fitted_params=fitted_params)
+        df_test_processed = preprocess_data(df_test, fitted_params=fitted_params)
 
         # Clean up original dataframes
         del df_train, df_val, df_test
@@ -129,12 +133,9 @@ def main():
         )
 
         # Step 4: Handle class imbalance with SMOTEENN
-
         logger.info("Applying SMOTEENN to training data")
         smote_enn = SMOTEENN(
-            smote=SMOTE(
-                sampling_strategy=0.3, random_state=42, k_neighbors=5, n_jobs=-1
-            ),
+            smote=SMOTE(sampling_strategy=0.3, random_state=42, k_neighbors=5),
             enn=EditedNearestNeighbours(n_jobs=-1),
             random_state=42,
         )

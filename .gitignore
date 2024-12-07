@@ -1,23 +1,30 @@
+# Byte-compiled / compiled files
 __pycache__/
 *.pyc
+
+# Operating system files
 .DS_Store
+
+# Environment and dependency files
 .env
 venv/
+
+# Logs and other runtime files
 *.log
 
+# Documentation and markdown files
 lastrun.md
 record.md
+
+# Python scripts
 old_evaluation.py
 
-data
-models*.pkl
+# Data files
 *.csv
-models/best_model_random forest.pkl
-data/processed/data_part1.csv
-data/processed/data_part2.csv
-data/processed/val_data.csv
-data/processed/test_data.csv
-models/best_model_xgboost.pkl
-data/processed/val_data.csv
-data/processed/test_data.csv
-models/best_model_xgboost.pkl
+!data/.gitkeep  # To keep the data directory in version control if empty
+
+# Model files
+*.pkl
+
+# Additional ignored paths
+models/best_model_random forest(tuned).pkl

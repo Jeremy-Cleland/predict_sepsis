@@ -14,7 +14,8 @@ from .evaluation import (
     plot_precision_recall_curve,
     plot_roc_curve,
 )
-from .feature_engineering import preprocess_data
+from .feature_engineering import preprocess_pipeline
+from .logger_config import get_logger, setup_logger
 from .models import (
     predict_xgboost,
     train_knn,
@@ -26,7 +27,6 @@ from .models import (
 from .utils import (
     corr_matrix,
     diagnostic_plots,
-    setup_logger,
     try_gaussian,
 )
 
@@ -34,7 +34,7 @@ __all__ = [
     "load_data",
     "load_processed_data",
     "split_data",
-    "preprocess_data",
+    "preprocess_pipeline",
     "train_random_forest",
     "train_naive_bayes",
     "train_knn",
@@ -50,6 +50,8 @@ __all__ = [
     "diagnostic_plots",
     "try_gaussian",
     "setup_logger",
-    plot_class_distribution,
-    plot_feature_correlation_heatmap,
+    "plot_class_distribution",
+    "plot_feature_correlation_heatmap",
+    "setup_logger",
+    "get_logger",
 ]

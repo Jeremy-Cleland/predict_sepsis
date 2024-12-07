@@ -1,9 +1,14 @@
-import logging
+# data_processing.py
+
 import os
 from typing import Tuple
 
 import numpy as np
 import pandas as pd
+
+from src.logger_config import get_logger
+
+logger = get_logger("sepsis_prediction.data_processing")
 
 
 def load_data(filepath: str) -> pd.DataFrame:
@@ -29,7 +34,7 @@ def load_data(filepath: str) -> pd.DataFrame:
     if df["SepsisLabel"].nunique() > 2:
         raise ValueError("SepsisLabel contains more than two unique values")
 
-    logging.info(f"Loaded dataset with {len(df)} rows and {len(df.columns)} columns")
+    logger.info(f"Loaded dataset with {len(df)} rows and {len(df.columns)} columns")
     return df
 
 
@@ -123,15 +128,15 @@ def split_data(
     ), "Patient overlap between val and test"
 
     # Log split information
-    logging.info("\nData Split Summary:")
-    logging.info("-" * 50)
-    logging.info(
+    logger.info("\nData Split Summary:")
+    logger.info("-" * 50)
+    logger.info(
         f"Training set:   {len(df_train)} rows, {len(train_patients)} unique patients"
     )
-    logging.info(
+    logger.info(
         f"Validation set: {len(df_val)} rows, {len(val_patients)} unique patients"
     )
-    logging.info(
+    logger.info(
         f"Testing set:    {len(df_test)} rows, {len(test_patients)} unique patients"
     )
 
@@ -142,7 +147,7 @@ def split_data(
         ("Testing", df_test),
     ]:
         sepsis_rate = df.groupby("Patient_ID")["SepsisLabel"].max().mean()
-        logging.info(f"{name} set sepsis rate: {sepsis_rate:.1%}")
+        logger.info(f"{name} set sepsis rate: {sepsis_rate:.1%}")
 
     # Save the split datasets
     os.makedirs("data/processed", exist_ok=True)

@@ -140,46 +140,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from scipy import stats
-from sklearn.preprocessing import StandardScaler
-
-
-def setup_logger(log_file="logs/sepsis_prediction.log"):
-    """Set up the logger with proper configuration to avoid double logging."""
-    os.makedirs(
-        os.path.dirname(log_file), exist_ok=True
-    )  # Ensure the log directory exists
-
-    # Get the logger
-    logger = logging.getLogger("SepsisPredictionLogger")
-
-    # Clear any existing handlers to avoid duplicate logs
-    if logger.handlers:
-        logger.handlers.clear()
-
-    # Prevent the logger from propagating messages to the root logger
-    logger.propagate = False
-
-    # Set the logging level for the logger
-    logger.setLevel(logging.INFO)
-
-    # Create console and file handlers
-    c_handler = logging.StreamHandler()  # Logs to the console
-    f_handler = logging.FileHandler(log_file)  # Logs to a file
-
-    # Set logging levels for handlers
-    c_handler.setLevel(logging.INFO)
-    f_handler.setLevel(logging.DEBUG)
-
-    # Define log message format
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    c_handler.setFormatter(formatter)  # Format for console handler
-    f_handler.setFormatter(formatter)  # Format for file handler
-
-    # Add handlers to the logger
-    logger.addHandler(c_handler)
-    logger.addHandler(f_handler)
-
-    return logger  # Return the configured logger
 
 
 def corr_matrix(df, figsize=(40, 40), vmax=0.3, logger=None):

@@ -25,10 +25,14 @@ from sklearn.metrics import (
     roc_curve,
 )
 
-from .utils import setup_logger
+from src.logger_config import setup_logger
 
-# Initialize logger
-logger = setup_logger("logs/evaluation.log")
+# Initialize logger with default log level ("INFO") and JSON formatting enabled
+logger = setup_logger(
+    name="sepsis_prediction.evaluation",
+    log_file="logs/evaluation.log",
+    use_json=True,
+)
 
 
 def setup_plot_style():

@@ -34,6 +34,7 @@ dependencies:
   - plotly
   - ipywidgets
   - ydata-profiling
+  - python-json-logger
 
   - pip:
     - python-dotenv
