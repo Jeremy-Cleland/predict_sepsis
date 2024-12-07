@@ -139,7 +139,7 @@ def main():
             title_suffix="_after_resampling",
         )
 
-        # Step 5: Train and evaluate models
+        # 5.1 Random Forest
         models = {}
         best_score = 0
         best_model_name = None
