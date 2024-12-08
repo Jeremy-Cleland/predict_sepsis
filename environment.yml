@@ -36,6 +36,7 @@ dependencies:
   - ydata-profiling
   - python-json-logger
   - xgboost
+  - fastparquet
 
   - pip:
     - python-dotenv
