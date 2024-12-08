@@ -1,0 +1,7 @@
+{
+    "random_forest__max_depth": null,
+    "random_forest__max_features": "log2",
+    "random_forest__min_samples_leaf": 2,
+    "random_forest__min_samples_split": 3,
+    "random_forest__n_estimators": 364
+}

@@ -28,3 +28,4 @@ old_evaluation.py
 
 # Additional ignored paths
 models/best_model_random forest(tuned).pkl
+checkpoints

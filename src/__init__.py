@@ -29,6 +29,7 @@ from .utils import (
     diagnostic_plots,
     try_gaussian,
 )
+from .logging_utils import log_phase, log_memory, log_dataframe_info, log_step
 
 __all__ = [
     "load_data",
@@ -54,4 +55,8 @@ __all__ = [
     "plot_feature_correlation_heatmap",
     "setup_logger",
     "get_logger",
+    "log_dataframe_info",
+    "log_memory",
+    "log_phase",
+    "log_step",
 ]

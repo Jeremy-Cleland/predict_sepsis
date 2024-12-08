@@ -1,223 +1,31 @@
 # feature_engineering.py
 
+import gc
 import os
+import tempfile
 import time
+from functools import partial
+from multiprocessing import cpu_count
+from typing import Dict, List, Optional, Tuple
 
 import joblib
 import numpy as np
 import pandas as pd
-from joblib import Parallel, cpu_count, delayed
+import psutil
+from joblib import Parallel, delayed
 from sklearn.experimental import enable_iterative_imputer  # noqa
-from sklearn.impute import IterativeImputer
+from sklearn.impute import IterativeImputer, SimpleImputer
 from sklearn.preprocessing import RobustScaler
 
 from src.logger_config import get_logger
+from src.logging_utils import (
+    log_phase,
+    log_step,
+    log_memory,
+    log_dataframe_info,
+)
 
 logger = get_logger("sepsis_prediction.preprocessing")
-
-
-def parallel_impute(data, imputer, n_jobs):
-    """
-    Perform parallel imputation using IterativeImputer with improved monitoring and convergence.
-    """
-
-    # Convert to numpy array first if it's a DataFrame
-    if isinstance(data, pd.DataFrame):
-        data = data.values
-
-    # Get actual number of jobs based on CPU cores
-    n_jobs = min(cpu_count(), n_jobs) if n_jobs > 0 else cpu_count()
-    chunk_size = len(data) // n_jobs
-
-    logger.info(f"Starting parallel imputation using {n_jobs} CPU cores")
-    logger.info(f"Data shape: {data.shape}")
-    logger.info(f"Chunk size: {chunk_size} rows")
-
-    # Create chunks with overlap to improve imputation at boundaries
-    overlap = 100  # Number of rows to overlap between chunks
-    chunks = []
-    convergence_info = []
-
-    for i in range(n_jobs):
-        start = max(0, i * chunk_size - overlap)
-        end = min(len(data), (i + 1) * chunk_size + overlap)
-        chunks.append(data[start:end])
-
-    def impute_chunk(chunk, chunk_id):
-        # Calculate valid min/max bounds for non-missing values
-        chunk_min = np.nanmin(chunk, axis=0)
-        chunk_max = np.nanmax(chunk, axis=0)
-
-        # Handle columns with all missing values or invalid bounds
-        valid_bounds = chunk_min < chunk_max
-        if not np.all(valid_bounds):
-            logger.warning(
-                f"Chunk {chunk_id}: Found {np.sum(~valid_bounds)} columns with invalid bounds"
-            )
-            # For invalid bounds, use reasonable defaults based on data type
-            chunk_min[~valid_bounds] = -1e6
-            chunk_max[~valid_bounds] = 1e6
-
-        # Configure chunk-specific imputer with monitoring
-        chunk_imputer = IterativeImputer(
-            max_iter=100,  # Increased from 50
-            tol=1e-2,  # Relaxed from 1e-3
-            random_state=42 + chunk_id,
-            initial_strategy="mean",  # Changed to mean for better stability
-            min_value=chunk_min,
-            max_value=chunk_max,
-            verbose=0,
-            imputation_order="ascending",
-            n_nearest_features=3,  # Reduced from 5 for faster convergence
-        )
-
-        start_time = time.time()
-        imputed_chunk = chunk_imputer.fit_transform(chunk)
-
-        # Collect convergence information
-        n_iter_reached = getattr(chunk_imputer, "n_iter_", 0)
-        tolerance_reached = getattr(chunk_imputer, "_imputed_mask", None)
-
-        convergence_info.append(
-            {
-                "chunk_id": chunk_id,
-                "n_iterations": n_iter_reached,
-                "time_taken": time.time() - start_time,
-                "shape": chunk.shape,
-                "missing_pct": np.isnan(chunk).mean() * 100,
-            }
-        )
-
-        return imputed_chunk, convergence_info[-1]
-
-    # Execute parallel imputation with progress monitoring
-    # ! Change Verbose to 10 for extensive logging
-    results = Parallel(n_jobs=n_jobs, verbose=0, backend="loky")(
-        delayed(impute_chunk)(chunk, i) for i, chunk in enumerate(chunks)
-    )
-
-    # Extract results and convergence info
-    imputed_chunks, conv_info = zip(*results)
-
-    # Remove overlap regions and combine chunks
-    final_chunks = []
-    for i, chunk in enumerate(imputed_chunks):
-        if i == 0:
-            final_chunks.append(chunk[:-overlap] if len(imputed_chunks) > 1 else chunk)
-        elif i == len(imputed_chunks) - 1:
-            final_chunks.append(chunk[overlap:])
-        else:
-            final_chunks.append(chunk[overlap:-overlap])
-
-    # Log convergence information
-    logger.info("Imputation Convergence Summary:")
-    for info in conv_info:
-        logger.info(
-            f"Chunk {info['chunk_id']}: "
-            f"Iterations={info['n_iterations']}, "
-            f"Time={info['time_taken']:.2f}s, "
-            f"Missing={info['missing_pct']:.2f}%"
-        )
-
-    combined_result = np.vstack(final_chunks)
-    logger.info(f"Parallel imputation completed. Final shape: {combined_result.shape}")
-
-    return combined_result
-
-
-def handle_missing_values(df):
-    """Handle missing values with improved parallel imputation."""
-    df = df.copy()
-    logger.info("Starting missing value handling with improved monitoring")
-
-    # Forward fill vital signs within patient groups (up to 4 hours)
-    vital_signs = ["HR", "O2Sat", "Temp", "SBP", "DBP", "MAP", "Resp"]
-    existing_vitals = [col for col in vital_signs if col in df.columns]
-
-    if existing_vitals:
-        df[existing_vitals] = df.groupby("Patient_ID")[existing_vitals].transform(
-            lambda x: x.ffill(limit=4)
-        )
-        logger.debug(
-            f"Completed forward-filling for {len(existing_vitals)} vital signs"
-        )
-
-    #! Add for Logging
-    # Log missing value statistics before imputation
-    # missing_stats = df.isnull().sum() / len(df) * 100
-    # logger.info("Missing value percentages before imputation:")
-    # for col, pct in missing_stats[missing_stats > 0].items():
-    #     logger.info(f"{col}: {pct:.2f}%")
-
-    # Create missing indicators for important lab values
-    lab_values = ["BUN", "Creatinine", "Glucose", "WBC", "Platelets"]
-    for col in lab_values:
-        if col in df.columns:
-            df[f"{col}_missing"] = df[col].isnull().astype(int)
-
-    # Use parallel iterative imputation for remaining numeric values
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
-    numeric_cols = numeric_cols.drop(
-        ["Patient_ID", "Hour", "SepsisLabel"]
-        + [f"{col}_missing" for col in lab_values],
-        errors="ignore",
-    )
-
-    # Check for columns with too many missing values
-    missing_pct = df[numeric_cols].isnull().mean()
-    too_many_missing = missing_pct > 0.99  # Columns with >99% missing
-    if any(too_many_missing):
-        logger.warning("Dropping columns with >99% missing values:")
-        for col in numeric_cols[too_many_missing]:
-            logger.warning(f"{col}: {missing_pct[col]*100:.2f}% missing")
-        numeric_cols = numeric_cols[~too_many_missing]
-
-    logger.info(f"Starting parallel imputation for {len(numeric_cols)} numeric columns")
-
-    # Validate data before imputation
-    numeric_data = df[numeric_cols]
-    if numeric_data.empty:
-        logger.error("No numeric columns to impute after filtering")
-        raise ValueError("No valid columns for imputation")
-
-    #! Add for Logging
-    # Log statistics about the data before imputation
-    # logger.info("\nNumeric columns statistics before imputation:")
-    # stats = numeric_data.agg(["count", "mean", "std", "min", "max"]).round(3)
-    # for col in numeric_cols:
-    #     logger.info(f"\n{col}:")
-    #     logger.info(f"Count: {stats.loc['count', col]}")
-    #     logger.info(f"Mean: {stats.loc['mean', col]}")
-    #     logger.info(f"Std: {stats.loc['std', col]}")
-    #     logger.info(f"Min: {stats.loc['min', col]}")
-    #     logger.info(f"Max: {stats.loc['max', col]}")
-
-    try:
-        imputed_data = parallel_impute(numeric_data, None, n_jobs=-1)
-        df[numeric_cols] = pd.DataFrame(
-            imputed_data, index=df.index, columns=numeric_cols
-        )
-
-        # Validate imputed data
-        if df[numeric_cols].isnull().any().any():
-            logger.error("Some values still missing after imputation")
-            missing_cols = df[numeric_cols].columns[df[numeric_cols].isnull().any()]
-            for col in missing_cols:
-                logger.error(f"{col}: {df[col].isnull().mean()*100:.2f}% still missing")
-            raise ValueError("Imputation failed to fill all missing values")
-
-        logger.info("Completed parallel imputation successfully")
-    except Exception as e:
-        logger.error(f"Error during parallel imputation: {str(e)}")
-        raise
-
-    # Log missing value statistics after imputation
-    missing_stats_after = df.isnull().sum() / len(df) * 100
-    logger.info("Missing value percentages after imputation:")
-    for col, pct in missing_stats_after[missing_stats_after > 0].items():
-        logger.info(f"{col}: {pct:.2f}%")
-
-    return df
 
 
 def analyze_and_drop_columns(df, missing_threshold=0.95, correlation_threshold=0.95):
@@ -247,6 +55,7 @@ def analyze_and_drop_columns(df, missing_threshold=0.95, correlation_threshold=0
     if "Unnamed: 0" in df.columns:
         dropped_columns["index"] = ["Unnamed: 0"]
         df = df.drop("Unnamed: 0", axis=1)
+        logger.info("Dropped 'Unnamed: 0' column as it is an index column.")
 
     # 2. Analyze missing values
     missing_rates = df.isnull().mean()
@@ -255,6 +64,10 @@ def analyze_and_drop_columns(df, missing_threshold=0.95, correlation_threshold=0
         dropped_columns["high_missing"] = {
             col: f"{missing_rates[col]:.2%} missing" for col in high_missing_cols
         }
+        df = df.drop(columns=high_missing_cols)
+        logger.info(
+            f"Dropped columns due to high missing rates (> {missing_threshold*100}%) : {high_missing_cols}"
+        )
 
     # 3. Analyze correlations between numerical columns
     numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns
@@ -296,6 +109,13 @@ def analyze_and_drop_columns(df, missing_threshold=0.95, correlation_threshold=0
                     }
                     seen_cols.add(drop_col)
 
+            # Drop the correlated columns
+            correlated_drops = list(dropped_columns["high_correlation"].keys())
+            df = df.drop(columns=correlated_drops)
+            logger.info(
+                f"Dropped columns due to high correlation (> {correlation_threshold*100}%) : {correlated_drops}"
+            )
+
     # 4. Define clinically redundant pairs (based on medical knowledge)
     clinical_pairs = {
         "pH": ["HCO3", "BaseExcess"],  # pH is related to these measures
@@ -318,81 +138,12 @@ def analyze_and_drop_columns(df, missing_threshold=0.95, correlation_threshold=0
                         "kept_instead": keep_col,
                         "missing_rate": f"{missing_rates[drop_col]:.2%}",
                     }
-
-    # Combine all columns to drop
-    all_drops = (
-        dropped_columns.get("index", [])
-        + list(dropped_columns.get("high_missing", {}).keys())
-        + list(dropped_columns.get("high_correlation", {}).keys())
-        + list(dropped_columns.get("clinical_redundancy", {}).keys())
-    )
-
-    # ! Add for Logging
-    # # Log the analysis
-    # logger.info("\nColumn Drop Analysis:")
-    # logger.info("-" * 50)
-
-    # if dropped_columns.get("index"):
-    #     logger.info("\nDropped index column:")
-    #     logger.info(f"  - {dropped_columns['index'][0]}")
-
-    # if dropped_columns.get("high_missing"):
-    #     logger.info("\nDropped due to high missing rate:")
-    #     for col, rate in dropped_columns["high_missing"].items():
-    #         logger.info(f"  - {col}: {rate}")
-
-    # if dropped_columns.get("high_correlation"):
-    #     logger.info("\nDropped due to high correlation:")
-    #     for col, info in dropped_columns["high_correlation"].items():
-    #         logger.info(
-    #             f"  - {col} (correlated with {info['correlated_with']}, r={info['correlation']})"
-    #         )
-
-    # if dropped_columns.get("clinical_redundancy"):
-    #     logger.info("\nDropped due to clinical redundancy:")
-    #     for col, info in dropped_columns["clinical_redundancy"].items():
-    #         logger.info(f"  - {col} (keeping {info['kept_instead']} instead)")
-
-    # Remove the columns
-    df = df.drop(columns=all_drops, errors="ignore")
-
-    # Log retention statistics
-    kept_cols = len(df.columns)
-    total_cols = len(df.columns) + len(all_drops)
-    logger.info(
-        f"\nRetained {kept_cols}/{total_cols} columns ({kept_cols/total_cols:.1%})"
-    )
+                    df = df.drop(columns=[drop_col])
+                    logger.info(
+                        f"Dropped '{drop_col}' due to clinical redundancy with '{keep_col}'."
+                    )
 
     return df, dropped_columns
-
-
-def engineer_vital_features(df):
-    """Engineer features from vital signs."""
-    df = df.copy()
-
-    if "HR" in df.columns and "SBP" in df.columns:
-        df["shock_index"] = df["HR"] / df["SBP"].clip(lower=1)
-
-    if "SBP" in df.columns and "DBP" in df.columns:
-        df["pulse_pressure"] = df["SBP"] - df["DBP"]
-
-    patient_groups = df.groupby("Patient_ID")
-    vital_signs = ["HR", "O2Sat", "Temp", "MAP", "Resp"]
-    vital_signs = [vs for vs in vital_signs if vs in df.columns]
-
-    for vital in vital_signs:
-        df[f"{vital}_rate"] = patient_groups[vital].transform(
-            lambda x: x.diff() / df["Hour"].diff()
-        )
-
-        df[f"{vital}_rolling_mean_6h"] = patient_groups[vital].transform(
-            lambda x: x.rolling(6, min_periods=1).mean()
-        )
-        df[f"{vital}_rolling_std_6h"] = patient_groups[vital].transform(
-            lambda x: x.rolling(6, min_periods=1).std()
-        )
-
-    return df
 
 
 def calculate_severity_scores(df):
@@ -412,6 +163,10 @@ def calculate_severity_scores(df):
     if all(comp in df.columns for comp in sirs_components):
         df["sirs_score"] = df[sirs_components].sum(axis=1)
 
+    logger.info("Calculated SIRS severity scores.")
+    log_memory(logger, "After Calculating Severity Scores")
+    log_dataframe_info(logger, df, "After Calculating Severity Scores")
+
     return df
 
 
@@ -426,67 +181,25 @@ def engineer_basic_vital_features(df, n_jobs=-1):
     if all(col in df.columns for col in ["SBP", "DBP"]):
         df["pulse_pressure"] = df["SBP"] - df["DBP"]
 
-    # Prepare for parallel processing
+    # Process groups in single thread when called from parallel pipeline
     vital_signs = ["HR", "O2Sat", "Temp", "MAP", "Resp"]
     vital_signs = [vs for vs in vital_signs if vs in df.columns]
 
-    def process_patient_group(group_data):
-        """Process a single patient group."""
-        result = pd.DataFrame(index=group_data.index)
-
+    # Process each group sequentially
+    for _, group in df.groupby("Patient_ID"):
+        result = pd.DataFrame(index=group.index)
         for vital in vital_signs:
-            # Rate of change calculation
-            result[f"{vital}_rate"] = (
-                group_data[vital].diff() / group_data["Hour"].diff()
-            )
+            result[f"{vital}_rate"] = group[vital].diff() / group["Hour"].diff()
 
-        return result
+        # Update the main dataframe
+        for col in result.columns:
+            df.loc[group.index, col] = result[col]
 
-    # Split data by patient for parallel processing
-    patient_groups = [group for _, group in df.groupby("Patient_ID")]
-
-    # Process groups in parallel
-    # ! Change Verbose to 10 for extensive logging
-    with Parallel(n_jobs=n_jobs, verbose=0, backend="threading") as parallel:
-        results = parallel(
-            delayed(process_patient_group)(group) for group in patient_groups
-        )
-
-    # Combine results
-    all_results = pd.concat(results)
-
-    # Sort index to match original dataframe
-    all_results = all_results.reindex(df.index)
-
-    # Add new columns to original dataframe
-    for col in all_results.columns:
-        df[col] = all_results[col]
+    logger.info("Engineered basic vital features.")
+    log_memory(logger, "After Engineering Basic Vital Features")
+    log_dataframe_info(logger, df, "After Engineering Basic Vital Features")
 
     return df
-
-
-# def engineer_advanced_vital_features(df):
-#     """Engineer features that require complete (imputed) data."""
-#     df = df.copy()
-
-#     patient_groups = df.groupby("Patient_ID")
-#     vital_signs = ["HR", "O2Sat", "Temp", "MAP", "Resp"]
-#     vital_signs = [vs for vs in vital_signs if vs in df.columns]
-
-#     for vital in vital_signs:
-#         # Rolling statistics (require complete data)
-#         df[f"{vital}_rolling_mean_6h"] = patient_groups[vital].transform(
-#             lambda x: x.rolling(6, min_periods=1).mean()
-#         )
-#         df[f"{vital}_rolling_std_6h"] = patient_groups[vital].transform(
-#             lambda x: x.rolling(6, min_periods=1).std()
-#         )
-
-#         # Baseline deviations (require complete data)
-#         baseline = patient_groups[vital].transform("first")
-#         df[f"{vital}_baseline_dev"] = df[vital] - baseline
-
-#     return df
 
 
 def engineer_advanced_vital_features(df, n_jobs=-1):
@@ -519,7 +232,6 @@ def engineer_advanced_vital_features(df, n_jobs=-1):
     patient_groups = [group for _, group in df.groupby("Patient_ID")]
 
     # Process groups in parallel
-    # ! Change Verbose to 10 for extensive logging
     with Parallel(n_jobs=n_jobs, verbose=0, backend="threading") as parallel:
         results = parallel(
             delayed(process_patient_group)(group) for group in patient_groups
@@ -534,6 +246,10 @@ def engineer_advanced_vital_features(df, n_jobs=-1):
     # Add new columns to original dataframe
     for col in all_results.columns:
         df[col] = all_results[col]
+
+    logger.info("Engineered advanced vital features.")
+    log_memory(logger, "After Engineering Advanced Vital Features")
+    log_dataframe_info(logger, df, "After Engineering Advanced Vital Features")
 
     return df
 
@@ -570,169 +286,687 @@ def process_dataframe_in_parallel(df, chunk_size=10000, n_jobs=-1):
     return pd.concat(processed_chunks)
 
 
-def encode_categorical_variables(
-    df, categorical_cols, is_training=True, training_categories=None
-):
+def impute_chunk(chunk, chunk_id, global_min=None, global_max=None):
     """
-    Encode categorical variables consistently across train/val/test sets.
+    Impute a single chunk of data with improved stability.
+    """
+    try:
+        # Ensure chunk is numpy array
+        chunk = chunk if isinstance(chunk, np.ndarray) else chunk.values
+
+        # Calculate bounds with safety margins
+        chunk_min = global_min if global_min is not None else np.nanmin(chunk, axis=0)
+        chunk_max = global_max if global_max is not None else np.nanmax(chunk, axis=0)
+
+        # Ensure dimensions match
+        if chunk_min.shape[0] != chunk.shape[1]:
+            logger.warning(
+                f"Dimension mismatch in chunk {chunk_id}. Adjusting bounds..."
+            )
+            chunk_min = chunk_min[: chunk.shape[1]]
+            chunk_max = chunk_max[: chunk.shape[1]]
+
+        # Add safety margin to bounds
+        margin = (chunk_max - chunk_min) * 0.1
+        chunk_min -= margin
+        chunk_max += margin
+
+        # Handle invalid bounds
+        valid_bounds = chunk_min < chunk_max
+        if not np.all(valid_bounds):
+            invalid_count = np.sum(~valid_bounds)
+            logger.warning(
+                f"Chunk {chunk_id}: Found {invalid_count} columns with invalid bounds"
+            )
+            chunk_min[~valid_bounds] = -1e6
+            chunk_max[~valid_bounds] = 1e6
+
+        # Configure imputer with more robust settings
+        chunk_imputer = IterativeImputer(
+            max_iter=200,
+            tol=1e-3,
+            random_state=42 + chunk_id,
+            initial_strategy="mean",
+            min_value=chunk_min,
+            max_value=chunk_max,
+            verbose=0,
+            imputation_order="ascending",
+            n_nearest_features=min(5, chunk.shape[1] - 1),
+            sample_posterior=True,
+        )
+
+        # Perform imputation
+        start_time = time.time()
+        try:
+            imputed_chunk = chunk_imputer.fit_transform(chunk)
+        except Exception as e:
+            logger.error(f"Imputation failed for chunk {chunk_id}: {str(e)}")
+            # Fallback to simple mean imputation
+            imputed_chunk = SimpleImputer(strategy="mean").fit_transform(chunk)
+
+        # Collect metrics
+        metrics = {
+            "chunk_id": chunk_id,
+            "n_iterations": getattr(chunk_imputer, "n_iter_", 0),
+            "time_taken": time.time() - start_time,
+            "shape": chunk.shape,
+            "missing_pct": np.isnan(chunk).mean() * 100,
+        }
+
+        return imputed_chunk, metrics
+
+    except Exception as e:
+        logger.error(f"Error in impute_chunk {chunk_id}: {str(e)}")
+        # Return original chunk and error metrics if imputation fails
+        return chunk, {
+            "chunk_id": chunk_id,
+            "error": str(e),
+            "shape": chunk.shape,
+            "time_taken": 0,
+            "n_iterations": 0,
+        }
+
+
+def parallel_impute(data: pd.DataFrame, n_jobs: int = -1) -> np.ndarray:
+    """
+    Perform imputation on the entire dataset using IterativeImputer,
+    ensuring consistency across all chunks.
 
     Parameters:
     -----------
-    df : pd.DataFrame
-        Data to encode
-    categorical_cols : list
-        List of categorical columns to encode
-    is_training : bool
-        Whether this is the training set
-    training_categories : dict, optional
-        Dictionary of categories from training set for consistent encoding
+    data : pd.DataFrame
+        The numeric data to impute.
+    n_jobs : int
+        Number of parallel jobs.
 
     Returns:
     --------
-    pd.DataFrame, dict
-        Encoded dataframe and dictionary of categories (if training)
+    np.ndarray
+        The imputed data as a NumPy array.
     """
+    from sklearn.impute import IterativeImputer
+
+    try:
+        logger.info("Starting Iterative Imputer on the entire dataset")
+        log_memory(logger, "Before Iterative Imputer")
+
+        imputer = IterativeImputer(
+            max_iter=100,
+            random_state=42,
+            n_nearest_features=5,
+            initial_strategy="mean",
+        )
+        imputed_data = imputer.fit_transform(data)
+
+        logger.info("Imputation completed successfully")
+        log_memory(logger, "After Iterative Imputer")
+        log_dataframe_info(
+            logger, pd.DataFrame(imputed_data, columns=data.columns), "After Imputation"
+        )
+
+        return imputed_data
+
+    except Exception as e:
+        logger.error(f"Error during imputation: {e}", exc_info=True)
+        log_memory(logger, "Error during Iterative Imputer")
+        raise
+
+
+def log_memory_usage():
+    """Log current memory usage of the process."""
+    process = psutil.Process()
+    memory_info = process.memory_info()
+    logger.info(f"Memory usage: {memory_info.rss / 1024 / 1024:.2f} MB")
+
+
+def save_checkpoint(df, stage, output_dir="checkpoints"):
+    """Save a checkpoint of the current dataframe."""
+    os.makedirs(output_dir, exist_ok=True)
+    checkpoint_path = f"{output_dir}/checkpoint_{stage}.parquet"
+    df.to_parquet(checkpoint_path)
+    logger.info(f"Saved checkpoint to {checkpoint_path}")
+    return checkpoint_path
+
+
+def load_checkpoint(stage, output_dir="checkpoints"):
+    """Load a checkpoint if it exists."""
+    checkpoint_path = f"{output_dir}/checkpoint_{stage}.parquet"
+    if os.path.exists(checkpoint_path):
+        logger.info(f"Loading checkpoint from {checkpoint_path}")
+        return pd.read_parquet(checkpoint_path)
+    return None
+
+
+def process_chunk_with_memory_tracking(chunk_data, transformers=None):
+    """Process a chunk of data with memory tracking."""
+    try:
+        initial_memory = psutil.Process().memory_info().rss
+        chunk = chunk_data.copy()
+
+        if transformers:
+            if "imputer" in transformers:
+                numeric_cols = chunk.select_dtypes(include=[np.number]).columns
+                chunk[numeric_cols] = transformers["imputer"].transform(
+                    chunk[numeric_cols]
+                )
+
+            if "scaler" in transformers:
+                numeric_cols = chunk.select_dtypes(include=[np.number]).columns
+                chunk[numeric_cols] = transformers["scaler"].transform(
+                    chunk[numeric_cols]
+                )
+
+        final_memory = psutil.Process().memory_info().rss
+        memory_diff = (final_memory - initial_memory) / 1024 / 1024  # MB
+
+        if memory_diff > 100:  # Log if memory increase is more than 100MB
+            logger.warning(
+                f"Large memory increase in chunk processing: {memory_diff:.2f} MB"
+            )
+
+        return chunk
+
+    except Exception as e:
+        logger.error(f"Error in process_chunk: {str(e)}")
+        raise
+    finally:
+        gc.collect()
+
+
+def encode_categorical_variables_optimized(
+    df, categorical_cols, is_training=True, training_categories=None
+):
+    """Memory-efficient categorical variable encoding with validation for binary units."""
+    try:
+        log_memory(logger, "Before Categorical Encoding")
+        logger.info("Starting categorical encoding")
+
+        def process_chunk(chunk, col, categories):
+            try:
+                result = {}
+                chunk_col = (
+                    chunk[col].fillna("Unknown").astype(str)
+                )  # Handle missing values and ensure string type
+
+                # For Unit columns, we know they're binary
+                if col in ["Unit1", "Unit2"]:
+                    # Ensure categories include 'Unknown'
+                    categories = ["0", "1", "Unknown"]
+                    result[f"{col}_0"] = (chunk_col == "0").astype(np.int8)
+                    result[f"{col}_1"] = (chunk_col == "1").astype(np.int8)
+                    result[f"{col}_Unknown"] = (chunk_col == "Unknown").astype(np.int8)
+                else:
+                    # For other categorical columns like Gender
+                    for cat in categories:
+                        result[f"{col}_{cat}"] = (chunk_col == cat).astype(np.int8)
+                    # Add an 'Unknown' category if unseen categories are present
+                    result[f"{col}_Unknown"] = (~chunk_col.isin(categories)).astype(
+                        np.int8
+                    )
+
+                return pd.DataFrame(result, index=chunk.index)
+            finally:
+                del chunk_col
+                gc.collect()
+
+        # Calculate optimal chunk size
+        available_memory = psutil.virtual_memory().available
+        rows_per_chunk = min(
+            50000,  # Maximum chunk size
+            max(
+                1000,  # Minimum chunk size
+                int(available_memory / (len(df.columns) * 8 * 20)),  # Safety factor
+            ),
+        )
+        logger.info(f"Using chunk size of {rows_per_chunk} for categorical encoding")
+
+        categories = {} if is_training else training_categories
+        result_df = df.copy()
+
+        for col in categorical_cols:
+            if col not in df.columns:
+                continue
+
+            logger.info(f"Processing column: {col}")
+            log_memory(logger, f"Before encoding column {col}")
+
+            if is_training:
+                if col in ["Unit1", "Unit2"]:
+                    # For units, we know the categories and add 'Unknown'
+                    categories[col] = ["0", "1"]
+                else:
+                    # For other columns, get categories from data
+                    unique_cats = set()
+                    for start_idx in range(0, len(df), rows_per_chunk):
+                        chunk = df.iloc[
+                            start_idx : min(start_idx + rows_per_chunk, len(df))
+                        ]
+                        unique_cats.update(
+                            chunk[col].fillna("Unknown").astype(str).unique()
+                        )
+                    categories[col] = sorted(
+                        unique_cats - {"Unknown"}
+                    )  # Exclude 'Unknown' if present
+
+                logger.info(f"Found {len(categories[col])} categories for {col}")
+
+            # Process in chunks
+            for start_idx in range(0, len(df), rows_per_chunk):
+                end_idx = min(start_idx + rows_per_chunk, len(df))
+                chunk = df.iloc[start_idx:end_idx]
+
+                # Process chunk
+                encoded_chunk = process_chunk(chunk, col, categories[col])
+
+                # Update result_df in place
+                for encoded_col in encoded_chunk.columns:
+                    result_df.loc[chunk.index, encoded_col] = encoded_chunk[encoded_col]
+
+                del chunk, encoded_chunk
+                gc.collect()
+
+            # Remove original column
+            result_df = result_df.drop(columns=[col])
+            gc.collect()
+
+            # Save intermediate checkpoint
+            save_checkpoint(result_df, f"encoded_{col}")
+            log_memory(logger, f"After encoding column {col}")
+            log_dataframe_info(logger, result_df, f"After encoding column {col}")
+
+        logger.info(
+            f"Encoded categorical columns. Current features: {list(result_df.columns)}"
+        )
+        log_memory(logger, "After Categorical Encoding")
+        log_dataframe_info(logger, result_df, "After Categorical Encoding")
+
+        return (result_df, categories) if is_training else (result_df, None)
+
+    except Exception as e:
+        logger.error(f"Error in categorical encoding: {str(e)}")
+        logger.error("Memory state when error occurred:")
+        log_memory(logger, "Error during Categorical Encoding")
+        raise
+    finally:
+        gc.collect()
+
+
+def handle_missing_values_chunk(df, fit=False):
+    """Single-threaded version of handle_missing_values for use in parallel processing."""
     df = df.copy()
-    categories = {} if is_training else training_categories
 
-    for col in categorical_cols:
-        if col not in df.columns:
-            continue
+    # Forward fill vital signs within patient groups
+    vital_signs = ["HR", "O2Sat", "Temp", "SBP", "DBP", "MAP", "Resp"]
+    existing_vitals = [col for col in vital_signs if col in df.columns]
 
-        # For numeric categorical variables (like Gender), first convert to string
-        df[col] = df[col].astype(str)
+    if existing_vitals:
+        df[existing_vitals] = df.groupby("Patient_ID")[existing_vitals].transform(
+            lambda x: x.ffill(limit=4)
+        )
+        logger.info("Applied forward fill to vital signs.")
 
-        if is_training:
-            # Store unique categories from training
-            categories[col] = sorted(df[col].unique())
+    # Create missing indicators
+    lab_values = ["BUN", "Creatinine", "Glucose", "WBC", "Platelets"]
+    for col in lab_values:
+        if col in df.columns:
+            df[f"{col}_missing"] = df[col].isnull().astype(int)
+            logger.info(f"Created missing indicator for {col}.")
 
-        # Create dummy variables
-        dummies = pd.get_dummies(df[col], prefix=col)
+    # Prepare numeric columns
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    numeric_cols = numeric_cols.drop(
+        ["Patient_ID", "Hour", "SepsisLabel"]
+        + [f"{col}_missing" for col in lab_values],
+        errors="ignore",
+    )
 
-        # If not training, ensure consistent columns with training set
-        if not is_training:
-            for cat in categories[col]:
-                dummy_col = f"{col}_{cat}"
-                if dummy_col not in dummies.columns:
-                    dummies[dummy_col] = 0
-            # Only keep columns that were in training
-            dummies = dummies[[f"{col}_{cat}" for cat in categories[col]]]
+    # Handle columns with too many missing values
+    missing_pct = df[numeric_cols].isnull().mean()
+    too_many_missing = missing_pct > 0.99
+    if any(too_many_missing):
+        cols_to_drop = missing_pct[too_many_missing].index.tolist()
+        df = df.drop(columns=cols_to_drop)
+        logger.info(
+            f"Dropped columns due to excessive missing values (>99%): {cols_to_drop}"
+        )
 
-        # Remove original column and add encoded columns
-        df = df.drop(columns=[col])
-        df = pd.concat([df, dummies], axis=1)
+    # Impute remaining numeric columns
+    numeric_data = df[numeric_cols]
+    if not numeric_data.empty:
+        imputed_data = parallel_impute(numeric_data, n_jobs=-1)  # Single thread
+        df[numeric_cols] = pd.DataFrame(
+            imputed_data, index=df.index, columns=numeric_cols
+        )
+        logger.info("Imputed missing values in numeric columns.")
+        log_memory(logger, "After Imputation")
+        log_dataframe_info(logger, df, "After Imputation")
 
-    if is_training:
-        return df, categories
     return df
 
 
-def preprocess_pipeline(train_df, val_df=None, test_df=None, n_jobs=-1):
-    """Parallel version of preprocessing pipeline."""
-    logger.info("Starting parallel preprocessing pipeline")
+def preprocess_pipeline(
+    train_df: pd.DataFrame,
+    val_df: Optional[pd.DataFrame] = None,
+    test_df: Optional[pd.DataFrame] = None,
+    n_jobs: int = -1,
+) -> Tuple[pd.DataFrame, Optional[pd.DataFrame], Optional[pd.DataFrame]]:
+    """
+    Complete preprocessing pipeline with fixed missing value handling.
+    """
+    try:
+        n_jobs = -1
+        logger.info("Starting preprocessing pipeline")
+        log_memory(logger, "Start of Preprocessing Pipeline")
+        log_dataframe_info(logger, train_df, "Initial Training Data")
 
-    # Initialize transformers dictionary
-    transformers = {}
+        # Configure parallel processing
+        n_jobs = min(cpu_count(), max(1, n_jobs if n_jobs > 0 else cpu_count()))
+        logger.info(f"Using {n_jobs} parallel jobs")
 
-    # 1. Initial cleaning and column analysis
-    logger.info("Analyzing columns based on training data")
-    train_df, drop_analysis = analyze_and_drop_columns(train_df)
+        # Store transformers for consistent preprocessing
+        transformers = {}
 
-    # Store dropped columns for consistent preprocessing
-    transformers["dropped_columns"] = drop_analysis
+        # 1. Initial cleaning and column analysis
+        with log_step(logger, "Analyzing and Dropping Columns"):
+            logger.info("Analyzing and dropping columns")
+            train_df, drop_analysis = analyze_and_drop_columns(train_df)
+            save_checkpoint(train_df, "after_column_analysis")
+            log_memory(logger, "After Analyzing and Dropping Columns")
+            log_dataframe_info(logger, train_df, "After Analyzing and Dropping Columns")
 
-    if val_df is not None:
-        val_df = val_df.drop(
-            columns=drop_analysis.get("dropped_columns", []), errors="ignore"
-        )
-    if test_df is not None:
-        test_df = test_df.drop(
-            columns=drop_analysis.get("dropped_columns", []), errors="ignore"
-        )
+            # Drop the same columns from validation and test sets
+            dropped_cols = set()
+            if drop_analysis.get("high_missing"):
+                dropped_cols.update(drop_analysis["high_missing"].keys())
+            if drop_analysis.get("high_correlation"):
+                dropped_cols.update(drop_analysis["high_correlation"].keys())
+            if drop_analysis.get("clinical_redundancy"):
+                dropped_cols.update(drop_analysis["clinical_redundancy"].keys())
+            if "index" in drop_analysis:
+                dropped_cols.update(drop_analysis["index"])
 
-    # 2. Basic feature engineering in parallel
-    logger.info("Creating basic features in parallel")
-    train_df = engineer_basic_vital_features(train_df, n_jobs=n_jobs)
-    if val_df is not None:
-        val_df = engineer_basic_vital_features(val_df, n_jobs=n_jobs)
-    if test_df is not None:
-        test_df = engineer_basic_vital_features(test_df, n_jobs=n_jobs)
+            if val_df is not None:
+                val_df = val_df.drop(columns=list(dropped_cols), errors="ignore")
+                logger.info(f"Dropped columns from validation set: {dropped_cols}")
+                log_dataframe_info(
+                    logger, val_df, "After Dropping Columns from Validation Set"
+                )
+            if test_df is not None:
+                test_df = test_df.drop(columns=list(dropped_cols), errors="ignore")
+                logger.info(f"Dropped columns from test set: {dropped_cols}")
+                log_dataframe_info(
+                    logger, test_df, "After Dropping Columns from Test Set"
+                )
 
-    # 3. Parallel missing value handling
-    # ! Change Verbose to 10 for extensive logging
-    logger.info("Handling missing values in parallel")
-    train_chunks = np.array_split(train_df, os.cpu_count())
-    with Parallel(n_jobs=n_jobs, verbose=0, backend="threading") as parallel:
-        processed_chunks = parallel(
-            delayed(handle_missing_values)(chunk) for chunk in train_chunks
-        )
-    train_df = pd.concat(processed_chunks)
+        # 2. Create missing indicators first
+        with log_step(logger, "Creating Missing Indicators"):
+            lab_values = ["BUN", "Creatinine", "Glucose", "WBC", "Platelets"]
+            for df, name in zip([train_df, val_df, test_df], ["train", "val", "test"]):
+                if df is not None:
+                    for col in lab_values:
+                        if col in df.columns:
+                            df[f"{col}_missing"] = df[col].isnull().astype(int)
+                            logger.info(
+                                f"Created missing indicator for {col} in {name} set."
+                            )
+                            log_dataframe_info(
+                                logger,
+                                df,
+                                f"After Creating Missing Indicator for {col} in {name} set",
+                            )
 
-    # 4. Advanced feature engineering in parallel
-    logger.info("Creating advanced features in parallel")
-    train_df = engineer_advanced_vital_features(train_df, n_jobs=n_jobs)
-    if val_df is not None:
-        val_df = engineer_advanced_vital_features(val_df, n_jobs=n_jobs)
-    if test_df is not None:
-        test_df = engineer_advanced_vital_features(test_df, n_jobs=n_jobs)
+            log_memory(logger, "After Creating Missing Indicators")
 
-    # 5. Calculate severity scores
-    train_df = calculate_severity_scores(train_df)
-    if val_df is not None:
-        val_df = calculate_severity_scores(val_df)
-    if test_df is not None:
-        test_df = calculate_severity_scores(test_df)
+        # 3. Basic feature engineering
+        with log_step(logger, "Basic Feature Engineering"):
+            logger.info("Creating basic features")
+            dfs = [train_df]
+            if val_df is not None:
+                dfs.append(val_df)
+            if test_df is not None:
+                dfs.append(test_df)
 
-    # 6. Handle categorical variables
-    categorical_cols = ["Gender", "Unit1", "Unit2"]
-    existing_cats = [col for col in categorical_cols if col in train_df.columns]
+            processed_dfs = []
+            for idx, df in enumerate(dfs):
+                try:
+                    processed_df = engineer_basic_vital_features(df, n_jobs=1)
+                    processed_dfs.append(processed_df)
+                    save_checkpoint(processed_df, f"basic_features_{idx}")
+                    gc.collect()
+                    logger.info(f"Processed basic features for dataset {idx}")
+                    log_memory(
+                        logger, f"After Basic Feature Engineering for dataset {idx}"
+                    )
+                    log_dataframe_info(
+                        logger,
+                        processed_df,
+                        f"After Basic Feature Engineering for dataset {idx}",
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Error in basic feature engineering for dataset {idx}: {str(e)}"
+                    )
+                    raise
 
-    if existing_cats:
-        logger.info("Encoding categorical variables")
-        # Encode training data and get categories
-        train_df, categories = encode_categorical_variables(
-            train_df, existing_cats, is_training=True
-        )
+            train_df = processed_dfs[0]
+            if val_df is not None:
+                val_df = processed_dfs[1]
+            if test_df is not None:
+                test_df = processed_dfs[2]
 
-        # Encode validation and test data using training categories
-        if val_df is not None:
-            val_df = encode_categorical_variables(
-                val_df, existing_cats, is_training=False, training_categories=categories
+            del processed_dfs
+            gc.collect()
+            log_memory(logger, "After Basic Feature Engineering")
+            log_dataframe_info(logger, train_df, "Processed Training Set")
+            if val_df is not None:
+                log_dataframe_info(logger, val_df, "Processed Validation Set")
+            if test_df is not None:
+                log_dataframe_info(logger, test_df, "Processed Test Set")
+
+        # 4. Handle missing values
+        with log_step(logger, "Handling Missing Values"):
+            logger.info("Handling missing values in datasets")
+            train_df = handle_missing_values_chunk(train_df)
+            if val_df is not None:
+                val_df = handle_missing_values_chunk(val_df)
+            if test_df is not None:
+                test_df = handle_missing_values_chunk(test_df)
+
+            save_checkpoint(train_df, "after_missing_values")
+            if val_df is not None:
+                save_checkpoint(val_df, "after_missing_values_val")
+            if test_df is not None:
+                save_checkpoint(test_df, "after_missing_values_test")
+            log_memory(logger, "After Handling Missing Values")
+            log_dataframe_info(
+                logger, train_df, "After Handling Missing Values - Training Set"
             )
-        if test_df is not None:
-            test_df = encode_categorical_variables(
-                test_df,
-                existing_cats,
-                is_training=False,
-                training_categories=categories,
+            if val_df is not None:
+                log_dataframe_info(
+                    logger, val_df, "After Handling Missing Values - Validation Set"
+                )
+            if test_df is not None:
+                log_dataframe_info(
+                    logger, test_df, "After Handling Missing Values - Test Set"
+                )
+
+        # 5. Calculate severity scores
+        with log_step(logger, "Calculating Severity Scores"):
+            logger.info("Calculating severity scores")
+            train_df = calculate_severity_scores(train_df)
+            if val_df is not None:
+                val_df = calculate_severity_scores(val_df)
+            if test_df is not None:
+                test_df = calculate_severity_scores(test_df)
+
+            save_checkpoint(train_df, "after_severity_scores")
+            if val_df is not None:
+                save_checkpoint(val_df, "after_severity_scores_val")
+            if test_df is not None:
+                save_checkpoint(test_df, "after_severity_scores_test")
+            log_memory(logger, "After Calculating Severity Scores")
+            log_dataframe_info(
+                logger, train_df, "After Calculating Severity Scores - Training Set"
             )
+            if val_df is not None:
+                log_dataframe_info(
+                    logger, val_df, "After Calculating Severity Scores - Validation Set"
+                )
+            if test_df is not None:
+                log_dataframe_info(
+                    logger, test_df, "After Calculating Severity Scores - Test Set"
+                )
 
-    # 7. Scale numeric features (fit on training data)
-    numeric_cols = train_df.select_dtypes(include=[np.number]).columns
-    numeric_cols = numeric_cols.drop(
-        ["Patient_ID", "Hour", "SepsisLabel"], errors="ignore"
-    )
+        # 6. Handle categorical variables
+        with log_step(logger, "Categorical Encoding"):
+            logger.info("Starting categorical encoding process")
+            categorical_cols = ["Gender", "Unit1", "Unit2"]
+            existing_cats = [col for col in categorical_cols if col in train_df.columns]
 
-    if len(numeric_cols) > 0:
-        logger.info("Scaling numeric features")
-        scaler = RobustScaler()
-        train_df[numeric_cols] = scaler.fit_transform(train_df[numeric_cols])
-        transformers["scaler"] = scaler
+            if existing_cats:
+                try:
+                    logger.info("Encoding training data...")
+                    train_df, categories = encode_categorical_variables_optimized(
+                        train_df, existing_cats, is_training=True
+                    )
+                    save_checkpoint(train_df, "encoded_train")
+                    transformers["categories"] = categories
+                    gc.collect()
+                    logger.info("Encoded training data.")
+                    log_memory(logger, "After Encoding Training Data")
+                    log_dataframe_info(logger, train_df, "After Encoding Training Data")
 
+                    if val_df is not None:
+                        logger.info("Encoding validation data...")
+                        val_df, _ = encode_categorical_variables_optimized(
+                            val_df,
+                            existing_cats,
+                            is_training=False,
+                            training_categories=categories,
+                        )
+                        save_checkpoint(val_df, "encoded_val")
+                        gc.collect()
+                        logger.info("Encoded validation data.")
+                        log_memory(logger, "After Encoding Validation Data")
+                        log_dataframe_info(
+                            logger, val_df, "After Encoding Validation Data"
+                        )
+
+                    if test_df is not None:
+                        logger.info("Encoding test data...")
+                        test_df, _ = encode_categorical_variables_optimized(
+                            test_df,
+                            existing_cats,
+                            is_training=False,
+                            training_categories=categories,
+                        )
+                        save_checkpoint(test_df, "encoded_test")
+                        gc.collect()
+                        logger.info("Encoded test data.")
+                        log_memory(logger, "After Encoding Test Data")
+                        log_dataframe_info(logger, test_df, "After Encoding Test Data")
+
+                except Exception as e:
+                    logger.error(f"Error in categorical encoding: {str(e)}")
+                    raise
+
+            log_memory(logger, "After Categorical Encoding")
+            if existing_cats:
+                log_dataframe_info(
+                    logger, train_df, "After Categorical Encoding - Training Set"
+                )
+                if val_df is not None:
+                    log_dataframe_info(
+                        logger, val_df, "After Categorical Encoding - Validation Set"
+                    )
+                if test_df is not None:
+                    log_dataframe_info(
+                        logger, test_df, "After Categorical Encoding - Test Set"
+                    )
+
+        # 7. Scale numeric features
+        with log_step(logger, "Scaling Numeric Features"):
+            logger.info("Scaling numeric features with RobustScaler")
+            numeric_cols = train_df.select_dtypes(include=[np.number]).columns
+            # Exclude ID columns, target variable, and missing indicators from scaling
+            exclude_cols = ["Patient_ID", "Hour", "SepsisLabel"] + [
+                f"{col}_missing"
+                for col in ["BUN", "Creatinine", "Glucose", "WBC", "Platelets"]
+            ]
+            numeric_cols = numeric_cols.drop(exclude_cols, errors="ignore")
+
+            if len(numeric_cols) > 0:
+                try:
+                    scaler = RobustScaler()
+                    train_df[numeric_cols] = scaler.fit_transform(
+                        train_df[numeric_cols]
+                    )
+                    transformers["scaler"] = scaler
+                    joblib.dump(scaler, "models/transformers/scaler.pkl")
+                    logger.info("Fitted and saved RobustScaler.")
+
+                    if val_df is not None:
+                        val_df[numeric_cols] = scaler.transform(val_df[numeric_cols])
+                        logger.info("Transformed validation data with RobustScaler.")
+                        log_dataframe_info(
+                            logger, val_df, "After Scaling - Validation Set"
+                        )
+                    if test_df is not None:
+                        test_df[numeric_cols] = scaler.transform(test_df[numeric_cols])
+                        logger.info("Transformed test data with RobustScaler.")
+                        log_dataframe_info(logger, test_df, "After Scaling - Test Set")
+
+                    save_checkpoint(train_df, "final_train")
+                    if val_df is not None:
+                        save_checkpoint(val_df, "final_val")
+                    if test_df is not None:
+                        save_checkpoint(test_df, "final_test")
+                    log_memory(logger, "After Scaling Numeric Features")
+                    log_dataframe_info(logger, train_df, "After Scaling - Training Set")
+
+                except Exception as e:
+                    logger.error(f"Error in feature scaling: {str(e)}")
+                    raise
+
+        # 8. Drop `Patient_ID` from all datasets before modeling
+        with log_step(logger, "Dropping 'Patient_ID' Columns"):
+            logger.info("Dropping 'Patient_ID' from all datasets before modeling")
+            for df, name in zip([train_df, val_df, test_df], ["train", "val", "test"]):
+                if df is not None and "Patient_ID" in df.columns:
+                    df.drop(columns=["Patient_ID"], inplace=True)
+                    logger.info(f"Dropped 'Patient_ID' from {name} set.")
+                    log_dataframe_info(
+                        logger,
+                        df,
+                        f"After Dropping 'Patient_ID' - {name.capitalize()} Set",
+                    )
+
+        # Save transformers
+        with log_step(logger, "Saving Transformers"):
+            try:
+                os.makedirs("models/transformers", exist_ok=True)
+                for name, transformer in transformers.items():
+                    joblib.dump(transformer, f"models/transformers/{name}.pkl")
+                    logger.info(
+                        f"Saved transformer '{name}' to models/transformers/{name}.pkl"
+                    )
+            except Exception as e:
+                logger.error(f"Error saving transformers: {str(e)}")
+                raise
+
+        logger.info(
+            f"Preprocessing pipeline completed successfully. Final features: {list(train_df.columns)}"
+        )
+        log_memory(logger, "End of Preprocessing Pipeline")
+        log_dataframe_info(logger, train_df, "Final Training Set")
         if val_df is not None:
-            val_df[numeric_cols] = scaler.transform(val_df[numeric_cols])
+            log_dataframe_info(logger, val_df, "Final Validation Set")
         if test_df is not None:
-            test_df[numeric_cols] = scaler.transform(test_df[numeric_cols])
+            log_dataframe_info(logger, test_df, "Final Test Set")
 
-    logger.info(f"Final shapes - Train: {train_df.shape}")
-    if val_df is not None:
-        logger.info(f"Validation: {val_df.shape}")
-    if test_df is not None:
-        logger.info(f"Test: {test_df.shape}")
+        return train_df, val_df, test_df
 
-    # Save transformers for future use
-    os.makedirs("models/transformers", exist_ok=True)
-    for name, transformer in transformers.items():
-        joblib.dump(transformer, f"models/transformers/{name}.pkl")
-
-    return train_df, val_df, test_df
+    except Exception as e:
+        logger.error(f"Error in preprocessing pipeline: {str(e)}")
+        log_memory(logger, "Error in Preprocessing Pipeline")
+        raise

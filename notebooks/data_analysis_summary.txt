@@ -1,0 +1,54 @@
+Data Analysis Summary
+==================================================
+
+Dataset Shape: (1552210, 45)
+Memory Usage: 522.55 MB
+Number of Patients: 40,336
+
+Unit Analysis
+--------------------
+Unique Unit1 values: 2
+Unique Unit2 values: 2
+Patients with multiple Unit1: 0
+Patients with multiple Unit2: 0
+
+Missing Values Summary
+--------------------
+                  Missing Values  Percentage
+Bilirubin_direct         1549220   99.807371
+Fibrinogen               1541968   99.340167
+TroponinI                1537429   99.047745
+Bilirubin_total          1529069   98.509158
+Alkalinephos             1527269   98.393194
+AST                      1527027   98.377604
+Lactate                  1510764   97.329872
+PTT                      1506511   97.055875
+SaO2                     1498649   96.549372
+EtCO2                    1494574   96.286843
+Phosphate                1489909   95.986303
+HCO3                     1487182   95.810618
+Chloride                 1481744   95.460279
+BaseExcess               1468065   94.579020
+PaCO2                    1465909   94.440121
+Calcium                  1460879   94.116067
+Platelets                1460001   94.059502
+Creatinine               1457594   93.904433
+Magnesium                1454259   93.689578
+WBC                      1452763   93.593199
+BUN                      1445642   93.134434
+pH                       1444637   93.069688
+Hgb                      1437619   92.617558
+FiO2                     1422845   91.665754
+Hct                      1414777   91.145979
+Potassium                1407685   90.689082
+Glucose                  1286694   82.894325
+Temp                     1026984   66.162697
+Unit1                     611960   39.425078
+Unit2                     611960   39.425078
+DBP                       486554   31.345887
+Resp                      238335   15.354559
+SBP                       226265   14.576958
+O2Sat                     202736   13.061119
+MAP                       193270   12.451279
+HR                        153399    9.882619
+HospAdmTime                    8    0.000515

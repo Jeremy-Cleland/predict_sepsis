@@ -35,7 +35,8 @@ dependencies:
   - ipywidgets
   - ydata-profiling
   - python-json-logger
+  - xgboost
 
   - pip:
     - python-dotenv
-    - -e .
+

@@ -1,474 +1,10 @@
-# # main.py
-
-# import gc
-# import logging
-# import os
-# from typing import Any
-
-# import joblib
-# import numpy as np
-# import pandas as pd
-# import xgboost as xgb
-# from imblearn.combine import SMOTEENN
-# from imblearn.over_sampling import SMOTE
-# from imblearn.pipeline import Pipeline as ImbPipeline
-# from imblearn.under_sampling import EditedNearestNeighbours
-# from sklearn.ensemble import RandomForestClassifier
-# from sklearn.metrics import (
-#     accuracy_score,
-#     f1_score,
-#     mean_absolute_error,
-#     mean_squared_error,
-#     precision_score,
-#     recall_score,
-#     roc_auc_score,
-# )
-# from sklearn.naive_bayes import GaussianNB
-# from sklearn.neighbors import KNeighborsClassifier
-# from sklearn.preprocessing import StandardScaler
-
-# from src import (
-#     evaluate_model,
-#     load_data,
-#     preprocess_data,
-#     split_data,
-#     train_logistic_regression,
-# )
-# from src.evaluation import (
-#     plot_class_distribution,
-#     plot_cumulative_gains,
-#     plot_feature_correlation_heatmap,
-#     plot_learning_curves,
-# )
-# from src.utils import setup_logger
-
-
-# def train_and_evaluate_model(
-#     model_name: str,
-#     pipeline: ImbPipeline,
-#     X_train: pd.DataFrame,
-#     y_train: pd.Series,
-#     X_val: pd.DataFrame,
-#     y_val: pd.Series,
-#     logger: logging.Logger,
-# ) -> tuple[float, Any]:
-#     """Train and evaluate a model, with proper logging and plotting."""
-#     logger.info(f"\nTraining {model_name}...")
-
-#     try:
-#         # Train the model
-#         pipeline.fit(X_train, y_train)
-
-#         # Make predictions
-#         y_pred = pipeline.predict(X_val)
-
-#         # Get predicted probabilities if available
-#         y_pred_proba = None
-#         if hasattr(pipeline, "predict_proba"):
-#             y_pred_proba = pipeline.predict_proba(X_val)[:, 1]
-
-#         # Calculate metrics
-#         metrics = {
-#             "Accuracy": accuracy_score(y_val, y_pred),
-#             "Precision": precision_score(y_val, y_pred, zero_division=0),
-#             "Recall": recall_score(y_val, y_pred, zero_division=0),
-#             "F1 Score": f1_score(y_val, y_pred, zero_division=0),
-#             "AUC-ROC": roc_auc_score(y_val, y_pred_proba)
-#             if y_pred_proba is not None
-#             else None,
-#             "Mean Absolute Error": mean_absolute_error(y_val, y_pred),
-#             "Root Mean Squared Error": np.sqrt(mean_squared_error(y_val, y_pred)),
-#         }
-
-#         # Log metrics
-#         logger.info(f"{model_name} Evaluation Results:")
-#         for metric_name, value in metrics.items():
-#             if value is not None:
-#                 logger.info(f"  {metric_name:<25} : {value:.4f}")
-#             else:
-#                 logger.info(f"  {metric_name:<25} : Not Available")
-
-#         # Save evaluation artifacts without additional logging
-#         # Pass the trained model for feature importance and SHAP
-#         model = pipeline.named_steps.get(model_name.lower().replace(" ", "_"))
-
-#         evaluate_model(
-#             y_val,
-#             y_pred,
-#             model_name=model_name.lower().replace(" ", "_"),
-#             logger=None,  # Prevent double logging from evaluate_model
-#             y_pred_proba=y_pred_proba,
-#             model=model,
-#         )
-
-#         # Plot Learning Curves
-#         plot_learning_curves(
-#             estimator=pipeline,
-#             X=X_train,
-#             y=y_train,
-#             model_name=model_name,
-#             report_dir="reports/evaluations",
-#             cv=5,
-#             scoring="f1",
-#         )
-
-#         # Log save completion
-#         logger.info(f"Saved evaluation artifacts for {model_name}\n")
-
-#         return metrics["F1 Score"], model
-
-#     finally:
-#         # Clear memory by deleting the pipeline and invoking garbage collection
-#         del pipeline
-#         gc.collect()
-
-
-# def main():
-#     # Set up logger
-#     logger = setup_logger()
-#     logger.info("Starting Sepsis Prediction Pipeline")
-
-#     try:
-#         # Step 1: Load and split the data
-#         logger.info("Loading raw data")
-#         combined_df = load_data("data/raw/Dataset.csv")
-#         logger.info("Splitting data into training, validation, and testing sets")
-#         df_train, df_val, df_test = split_data(
-#             combined_df, train_size=0.7, val_size=0.15
-#         )
-
-#         # Plot Class Distribution before resampling
-#         plot_class_distribution(
-#             y=df_train["SepsisLabel"],
-#             model_name="Original Training Data",
-#             report_dir="reports/evaluations",
-#             title_suffix="_before_resampling",
-#         )
-
-#         # Step 2: Preprocess all datasets
-#         logger.info("Preprocessing all datasets")
-#         df_train_processed = preprocess_data(df_train)
-#         del df_train
-#         gc.collect()
-#         df_val_processed = preprocess_data(df_val)
-#         del df_val
-#         gc.collect()
-#         df_test_processed = preprocess_data(df_test)
-#         del df_test
-#         gc.collect()
-
-#         # Plot Class Distribution after resampling will be done after resampling
-
-#         # Step 3: Prepare features and targets
-#         X_train = df_train_processed.drop("SepsisLabel", axis=1)
-#         y_train = df_train_processed["SepsisLabel"]
-#         X_val = df_val_processed.drop("SepsisLabel", axis=1)
-#         y_val = df_val_processed["SepsisLabel"]
-#         X_test = df_test_processed.drop("SepsisLabel", axis=1)
-#         y_test = df_test_processed["SepsisLabel"]
-
-#         # Plot Feature Correlation Heatmap
-#         plot_feature_correlation_heatmap(
-#             df=X_train, model_name="Training Data", report_dir="reports/evaluations"
-#         )
-
-#         # Step 4: Handle class imbalance (SMOTEENN) - Only on training data
-#         logger.info("Applying SMOTEENN to training data")
-
-#         # Initialize KNN for SMOTE
-#         knn_smote = KNeighborsClassifier(n_jobs=-1)
-
-#         # Configure SMOTE with the KNN estimator
-#         smote = SMOTE(sampling_strategy=0.3, random_state=42, k_neighbors=knn_smote)
-
-#         # Configure ENN
-#         enn = EditedNearestNeighbours(n_jobs=-1)
-
-#         # Combine them in SMOTEENN
-#         smote_enn = SMOTEENN(smote=smote, enn=enn, random_state=42)
-
-#         # Resample the training data
-#         X_train_resampled, y_train_resampled = smote_enn.fit_resample(X_train, y_train)
-
-#         # Plot Class Distribution after resampling
-#         plot_class_distribution(
-#             y=y_train_resampled,
-#             model_name="Resampled Training Data",
-#             report_dir="reports/evaluations",
-#             title_suffix="_after_resampling",
-#         )
-
-#         logger.info(
-#             f"Original class distribution - Class 1: {y_train.sum()}, Class 0: {len(y_train) - y_train.sum()}"
-#         )
-#         logger.info(
-#             f"Resampled class distribution - Class 1: {y_train_resampled.sum()}, Class 0: {len(y_train_resampled) - y_train_resampled.sum()}"
-#         )
-
-#         # Step 5: Train and evaluate models
-#         models = {}
-#         best_score = 0
-#         best_model_name = None
-
-#         # 5.1 Random Forest
-#         rf_pipeline = ImbPipeline(
-#             [
-#                 ("scaler", StandardScaler()),
-#                 (
-#                     "random_forest",
-#                     RandomForestClassifier(
-#                         n_estimators=100,
-#                         max_depth=20,
-#                         random_state=42,
-#                         class_weight="balanced",
-#                         n_jobs=-1,
-#                     ),
-#                 ),
-#             ]
-#         )
-#         score, models["Random Forest"] = train_and_evaluate_model(
-#             "Random Forest",
-#             rf_pipeline,
-#             X_train_resampled,
-#             y_train_resampled,
-#             X_val,
-#             y_val,
-#             logger,
-#         )
-#         if score > best_score:
-#             best_score = score
-#             best_model_name = "Random Forest"
-
-#         # After training Random Forest, delete the pipeline and collect garbage
-#         del rf_pipeline
-#         gc.collect()
-
-#         # 5.2 Naive Bayes
-#         nb_pipeline = ImbPipeline(
-#             [("scaler", StandardScaler()), ("naive_bayes", GaussianNB())]
-#         )
-#         score, models["Naive Bayes"] = train_and_evaluate_model(
-#             "Naive Bayes",
-#             nb_pipeline,
-#             X_train_resampled,
-#             y_train_resampled,
-#             X_val,
-#             y_val,
-#             logger,
-#         )
-#         if score > best_score:
-#             best_score = score
-#             best_model_name = "Naive Bayes"
-
-#         # After training Naive Bayes, delete the pipeline and collect garbage
-#         del nb_pipeline
-#         gc.collect()
-
-#         # 5.3 KNN
-#         knn_pipeline = ImbPipeline(
-#             [
-#                 ("scaler", StandardScaler()),
-#                 (
-#                     "knn",
-#                     KNeighborsClassifier(
-#                         n_neighbors=5,
-#                         weights="distance",
-#                         algorithm="auto",
-#                         leaf_size=30,
-#                         p=2,
-#                         n_jobs=-1,
-#                         metric="minkowski",
-#                     ),
-#                 ),
-#             ]
-#         )
-#         score, models["KNN"] = train_and_evaluate_model(
-#             "KNN",
-#             knn_pipeline,
-#             X_train_resampled,
-#             y_train_resampled,
-#             X_val,
-#             y_val,
-#             logger,
-#         )
-#         if score > best_score:
-#             best_score = score
-#             best_model_name = "KNN"
-
-#         # After training KNN, delete the pipeline and collect garbage
-#         del knn_pipeline
-#         gc.collect()
-
-#         # 5.4 Logistic Regression
-#         lr_model = train_logistic_regression(X_train_resampled, y_train_resampled)
-#         lr_pipeline = ImbPipeline(
-#             [("scaler", StandardScaler()), ("logistic_regression", lr_model)]
-#         )
-#         score, models["Logistic Regression"] = train_and_evaluate_model(
-#             "Logistic Regression",
-#             lr_pipeline,
-#             X_train_resampled,
-#             y_train_resampled,
-#             X_val,
-#             y_val,
-#             logger,
-#         )
-#         if score > best_score:
-#             best_score = score
-#             best_model_name = "Logistic Regression"
-
-#         # After training Logistic Regression, delete the pipeline and collect garbage
-#         del lr_pipeline
-#         gc.collect()
-
-#         # 5.5 XGBoost
-#         try:
-#             logger.info("Training XGBoost model")
-
-#             # Convert data to numpy arrays using .to_numpy() for consistency
-#             X_train_array = X_train_resampled.to_numpy()
-#             y_train_array = y_train_resampled.to_numpy()
-#             X_val_array = X_val.to_numpy()
-#             y_val_array = y_val.to_numpy()
-
-#             # XGBoost parameters
-#             xgb_params = {
-#                 "max_depth": 6,
-#                 "min_child_weight": 1,
-#                 "eta": 0.05,
-#                 "subsample": 0.8,
-#                 "colsample_bytree": 0.8,
-#                 "objective": "binary:logistic",
-#                 "eval_metric": ["auc", "error"],
-#                 "alpha": 1,
-#                 "lambda": 1,
-#                 "tree_method": "hist",
-#                 "random_state": 42,
-#             }
-
-#             # Create DMatrix objects
-#             dtrain = xgb.DMatrix(X_train_array, label=y_train_array)
-#             dval = xgb.DMatrix(X_val_array, label=y_val_array)
-
-#             # Prepare watchlist for evaluation
-#             watchlist = [(dtrain, "train"), (dval, "eval")]
-
-#             # Train XGBoost model
-#             xgb_model = xgb.train(
-#                 params=xgb_params,
-#                 dtrain=dtrain,
-#                 num_boost_round=200,
-#                 evals=watchlist,
-#                 early_stopping_rounds=20,
-#                 verbose_eval=False,  # Suppress training logs
-#             )
-
-#             # Make predictions
-#             y_pred_proba = xgb_model.predict(dval)
-#             y_pred = (y_pred_proba > 0.5).astype(int)
-
-#             # Calculate metrics (only F1 Score for selection)
-#             score = f1_score(y_val, y_pred)
-#             models["XGBoost"] = xgb_model
-
-#             # Update best model if necessary
-#             if score > best_score:
-#                 best_score = score
-#                 best_model_name = "XGBoost"
-
-#             # Log XGBoost specific metrics using evaluate_model
-#             evaluate_model(
-#                 y_val,
-#                 y_pred,
-#                 model_name="xgboost",
-#                 logger=None,
-#                 y_pred_proba=y_pred_proba,
-#                 model=xgb_model,
-#             )
-
-#             # Plot Learning Curves for XGBoost (if applicable)
-#             # Note: Learning Curves for boosting models can be time-consuming
-#             # Consider limiting the number of training examples or iterations
-#             # plot_learning_curves(...)  # Implement if desired
-
-#             # Log the artifact saving
-#             logger.info(f"Saved evaluation artifacts for XGBoost\n")
-
-#             # After training XGBoost, delete DMatrix objects and model if not needed
-#             del dtrain, dval, xgb_model
-#             gc.collect()
-
-#         except Exception as e:
-#             logger.error(f"Error in XGBoost training: {str(e)}", exc_info=True)
-#             logger.info("Skipping XGBoost due to error")
-
-#         # Step 6: Final evaluation on test set
-#         logger.info(f"\nPerforming final evaluation with best model: {best_model_name}")
-#         best_model = models[best_model_name]
-
-#         if best_model_name == "XGBoost":
-#             # Convert test data to numpy array using .to_numpy()
-#             X_test_array = X_test.to_numpy()
-#             dtest = xgb.DMatrix(X_test_array)
-#             final_predictions_proba = best_model.predict(dtest)
-#             final_predictions = (final_predictions_proba > 0.5).astype(int)
-
-#             # Clean up DMatrix
-#             del dtest
-#             gc.collect()
-
-#             # Evaluate using y_pred_proba
-#             evaluate_model(
-#                 y_test,
-#                 final_predictions,
-#                 model_name=f"final_{best_model_name.lower().replace(' ', '_')}",
-#                 logger=logger,
-#                 y_pred_proba=final_predictions_proba,
-#                 model=best_model,
-#             )
-#         else:
-#             final_predictions = best_model.predict(X_test)
-
-#             # Evaluate without y_pred_proba
-#             evaluate_model(
-#                 y_test,
-#                 final_predictions,
-#                 model_name=f"final_{best_model_name.lower().replace(' ', '_')}",
-#                 logger=logger,
-#                 model=best_model,
-#             )
-
-#         # Step 7: Save the best model
-#         logger.info(f"Saving the best model ({best_model_name})")
-#         model_dir = "models"
-#         os.makedirs(model_dir, exist_ok=True)
-#         model_path = os.path.join(
-#             model_dir, f"best_model_{best_model_name.lower().replace(' ', '_')}.pkl"
-#         )
-#         joblib.dump(best_model, model_path)
-#         logger.info(f"Model saved to {model_path}")
-
-#         # Optionally, delete the best model from memory if no longer needed
-#         del best_model
-#         gc.collect()
-
-#         logger.info("Sepsis Prediction Pipeline completed successfully.")
-
-#     except Exception as e:
-#         logger.error(f"An error occurred: {str(e)}", exc_info=True)
-#         raise
-
-
-# if __name__ == "__main__":
-#     main()
-
-
-# main.py
+# main1.py
 
 import gc
-import logging
+import json
 import os
-from typing import Any
+from typing import Any, Tuple
+from scipy.stats import randint, uniform
 
 import joblib
 import numpy as np
@@ -479,28 +15,30 @@ from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline as ImbPipeline
 from imblearn.under_sampling import EditedNearestNeighbours
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (
-    accuracy_score,
-    f1_score,
-    mean_absolute_error,
-    mean_squared_error,
-    precision_score,
-    recall_score,
-    roc_auc_score,
-)
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import StratifiedKFold, RandomizedSearchCV
 
 from src import (
-    evaluate_model,
+    evaluate_model,  # Import the updated unified evaluation function
     load_data,
-    preprocess_data,
+    preprocess_pipeline,
     split_data,
     train_logistic_regression,
 )
 from src.evaluation import plot_class_distribution, plot_feature_correlation_heatmap
-from src.utils import setup_logger
+
+from src.logging_utils import log_phase, log_step, log_memory, log_dataframe_info
+from src.logger_config import setup_logger
+
+
+# Initialize logger
+logger = setup_logger(
+    name="sepsis_prediction.main",
+    log_file="logs/sepsis_prediction.log",
+    use_json=False,
+)
 
 
 def train_and_evaluate_model(
@@ -510,408 +48,539 @@ def train_and_evaluate_model(
     y_train: pd.Series,
     X_val: pd.DataFrame,
     y_val: pd.Series,
-    logger: logging.Logger,
-) -> tuple[float, Any]:
-    """Train and evaluate a model, with proper logging and plotting."""
+) -> Tuple[float, Any]:
+    """Train and evaluate a model using the unified evaluation function."""
     logger.info(f"\nTraining {model_name}...")
 
     try:
+        # Log memory before training
+        log_memory(logger, f"Before training {model_name}")
+
         # Train the model
         pipeline.fit(X_train, y_train)
 
         # Make predictions
         y_pred = pipeline.predict(X_val)
 
+        # Get the actual model from the pipeline
+        model = None
+        for step_name, estimator in pipeline.named_steps.items():
+            if isinstance(
+                estimator,
+                (
+                    RandomForestClassifier,
+                    GaussianNB,
+                    KNeighborsClassifier,
+                    LogisticRegression,
+                ),
+            ):
+                model = estimator
+                break
+
+        if model is None:
+            logger.warning(f"No compatible model found in pipeline for {model_name}.")
+            return 0.0, None
+
         # Get predicted probabilities if available
         y_pred_proba = None
-        if hasattr(pipeline, "predict_proba"):
-            y_pred_proba = pipeline.predict_proba(X_val)[:, 1]
+        if hasattr(model, "predict_proba"):
+            y_pred_proba = model.predict_proba(X_val)[:, 1]
 
-        # Calculate metrics
-        metrics = {
-            "Accuracy": accuracy_score(y_val, y_pred),
-            "Precision": precision_score(y_val, y_pred, zero_division=0),
-            "Recall": recall_score(y_val, y_pred, zero_division=0),
-            "F1 Score": f1_score(y_val, y_pred, zero_division=0),
-            "AUC-ROC": roc_auc_score(y_val, y_pred_proba)
-            if y_pred_proba is not None
-            else None,
-            "Mean Absolute Error": mean_absolute_error(y_val, y_pred),
-            "Root Mean Squared Error": np.sqrt(mean_squared_error(y_val, y_pred)),
-        }
-
-        # Log metrics
-        logger.info(f"{model_name} Evaluation Results:")
-        for metric_name, value in metrics.items():
-            if value is not None:
-                logger.info(f"  {metric_name:<25} : {value:.4f}")
-            else:
-                logger.info(f"  {metric_name:<25} : Not Available")
-
-        # Save evaluation artifacts without additional logging
-        # Pass the trained model for feature importance and SHAP
-        model = pipeline.named_steps.get(model_name.lower().replace(" ", "_"))
-
-        # Assuming X_val is the feature set for SHAP plots
-        evaluate_model(
-            y_val,
-            y_pred,
+        # Use the unified evaluation function
+        metrics = evaluate_model(
+            y_true=y_val,
+            y_pred=y_pred,
             model_name=model_name.lower().replace(" ", "_"),
-            logger=None,  # Prevent double logging from evaluate_model
             y_pred_proba=y_pred_proba,
             model=model,
-            X_features=X_val,  # Pass feature set for SHAP
         )
 
-        # Log save completion
-        logger.info(f"Saved evaluation artifacts for {model_name}\n")
+        # Log memory after training
+        log_memory(logger, f"After training {model_name}")
 
-        # Plot Learning Curves
-        evaluate_model(
-            y_val,
-            y_pred,
-            model_name=model_name.lower().replace(" ", "_"),
-            report_dir="reports/evaluations",
-            logger=None,
-            y_pred_proba=y_pred_proba,
-            model=model,
-            X_features=X_val,  # Pass feature set for SHAP
+        return metrics.get("F1 Score", 0.0), model
+
+    except Exception as e:
+        logger.error(
+            f"Error in training and evaluation of {model_name}: {e}", exc_info=True
         )
-
-        return metrics["F1 Score"], model
+        return 0.0, None
 
     finally:
-        # Clear memory by deleting the pipeline and invoking garbage collection
+        # Clear memory
         del pipeline
         gc.collect()
 
 
+@log_phase(logger)
 def main():
-    # Set up logger
-    logger = setup_logger()
     logger.info("Starting Sepsis Prediction Pipeline")
 
     try:
+        # Ensure necessary directories exist
+        os.makedirs("logs", exist_ok=True)
+        os.makedirs("reports/evaluations", exist_ok=True)
+        os.makedirs("models", exist_ok=True)
+
         # Step 1: Load and split the data
-        logger.info("Loading raw data")
-        combined_df = load_data("data/raw/Dataset.csv")
-        logger.info("Splitting data into training, validation, and testing sets")
-        df_train, df_val, df_test = split_data(
-            combined_df, train_size=0.7, val_size=0.15
-        )
+        with log_step(logger, "Data Loading and Splitting"):
+            logger.info("Loading raw data from data/raw/Dataset.csv")
+            combined_df = load_data("data/raw/Dataset.csv")
+            log_dataframe_info(logger, combined_df, "Initial")
 
-        # Plot Class Distribution before resampling
-        plot_class_distribution(
-            y=df_train["SepsisLabel"],
-            model_name="Original Training Data",
-            report_dir="reports/evaluations",
-            title_suffix="_before_resampling",
-        )
+            logger.info("Splitting data into training, validation, and testing sets")
+            df_train, df_val, df_test = split_data(
+                combined_df, train_size=0.7, val_size=0.15
+            )
 
-        # Step 2: Preprocess all datasets
-        logger.info("Preprocessing all datasets")
-        df_train_processed = preprocess_data(df_train)
-        del df_train
-        gc.collect()
-        df_val_processed = preprocess_data(df_val)
-        del df_val
-        gc.collect()
-        df_test_processed = preprocess_data(df_test)
-        del df_test
-        gc.collect()
+            # Plot initial class distribution
+            plot_class_distribution(
+                y=df_train["SepsisLabel"],
+                model_name="Original Training Data",
+                report_dir="reports/evaluations",
+                title_suffix="_before_resampling",
+            )
+
+            # Log memory after data splitting
+            log_memory(logger, "After Data Loading and Splitting")
+
+        # Step 2: Preprocess all datasets together with parallel processing
+        with log_step(logger, "Data Preprocessing"):
+            logger.info("Preprocessing all datasets")
+            log_memory(logger, "Before Preprocessing")
+            df_train_processed, df_val_processed, df_test_processed = (
+                preprocess_pipeline(
+                    train_df=df_train,
+                    val_df=df_val,
+                    test_df=df_test,
+                    n_jobs=-1,
+                )
+            )
+            log_memory(logger, "After Preprocessing")
+
+            log_dataframe_info(logger, df_train_processed, "Training Processed")
+            log_dataframe_info(logger, df_val_processed, "Validation Processed")
+            log_dataframe_info(logger, df_test_processed, "Test Processed")
+
+            # Clean up original dataframes
+            del df_train, df_val, df_test, combined_df
+            gc.collect()
+            logger.info("Cleaned up original dataframes after preprocessing")
+            log_memory(logger, "After Cleaning Up Original Dataframes")
 
         # Step 3: Prepare features and targets
-        X_train = df_train_processed.drop("SepsisLabel", axis=1)
-        y_train = df_train_processed["SepsisLabel"]
-        X_val = df_val_processed.drop("SepsisLabel", axis=1)
-        y_val = df_val_processed["SepsisLabel"]
-        X_test = df_test_processed.drop("SepsisLabel", axis=1)
-        y_test = df_test_processed["SepsisLabel"]
+        with log_step(logger, "Feature and Target Preparation"):
+            log_memory(logger, "Before Feature and Target Preparation")
+            X_train = df_train_processed.drop("SepsisLabel", axis=1)
+            y_train = df_train_processed["SepsisLabel"]
+            X_val = df_val_processed.drop("SepsisLabel", axis=1)
+            y_val = df_val_processed["SepsisLabel"]
+            X_test = df_test_processed.drop("SepsisLabel", axis=1)
+            y_test = df_test_processed["SepsisLabel"]
 
-        # Plot Feature Correlation Heatmap
-        plot_feature_correlation_heatmap(
-            df=X_train,
-            model_name="Training Data",
-            report_dir="reports/evaluations",
-        )
+            # Plot feature correlation heatmap
+            plot_feature_correlation_heatmap(
+                df=X_train,
+                model_name="Training Data",
+                report_dir="reports/evaluations",
+            )
 
-        # Step 4: Handle class imbalance (SMOTEENN) - Only on training data
-        logger.info("Applying SMOTEENN to training data")
+            # Log feature names after preprocessing
+            logger.info(f"Training data features: {list(X_train.columns)}")
+            logger.info(f"Validation data features: {list(X_val.columns)}")
+            logger.info(f"Test data features: {list(X_test.columns)}")
 
-        # Configure SMOTE with the correct k_neighbors parameter
-        # ! change back to 0.3
-        smote = SMOTE(sampling_strategy=0.1, random_state=42, k_neighbors=5)
+            # Check for feature consistency
+            train_features = set(X_train.columns)
+            val_features = set(X_val.columns)
+            test_features = set(X_test.columns)
 
-        # Configure ENN
-        enn = EditedNearestNeighbours(n_jobs=-1)
+            if train_features != val_features:
+                logger.error("Feature mismatch between training and validation sets.")
+                logger.error(f"Training features: {train_features}")
+                logger.error(f"Validation features: {val_features}")
+                raise ValueError("Training and validation feature sets do not match.")
 
-        # Combine them in SMOTEENN
-        smote_enn = SMOTEENN(smote=smote, enn=enn, random_state=42)
+            if train_features != test_features:
+                logger.error("Feature mismatch between training and test sets.")
+                logger.error(f"Training features: {train_features}")
+                logger.error(f"Test features: {test_features}")
+                raise ValueError("Training and test feature sets do not match.")
 
-        # Resample the training data
-        X_train_resampled, y_train_resampled = smote_enn.fit_resample(X_train, y_train)
+            log_memory(logger, "After Feature and Target Preparation")
 
-        # Plot Class Distribution after resampling
-        plot_class_distribution(
-            y=y_train_resampled,
-            model_name="Resampled Training Data",
-            report_dir="reports/evaluations",
-            title_suffix="_after_resampling",
-        )
+        # Step 4: Handle class imbalance with SMOTEENN
+        with log_step(logger, "Handling Class Imbalance with SMOTEENN"):
+            logger.info("Applying SMOTEENN to training data")
+            log_memory(logger, "Before SMOTEENN")
 
-        logger.info(
-            f"Original class distribution - Class 1: {y_train.sum()}, Class 0: {len(y_train) - y_train.sum()}"
-        )
-        logger.info(
-            f"Resampled class distribution - Class 1: {y_train_resampled.sum()}, Class 0: {len(y_train_resampled) - y_train_resampled.sum()}"
-        )
+            smote = SMOTE(sampling_strategy=0.3, random_state=42, k_neighbors=5)
+            enn = EditedNearestNeighbours()
+            smote_enn = SMOTEENN(smote=smote, enn=enn, random_state=42)
+            X_train_resampled, y_train_resampled = smote_enn.fit_resample(
+                X_train, y_train
+            )
 
-        # Step 5: Train and evaluate models
-        models = {}
-        best_score = 0
-        best_model_name = None
+            # Ensure 'Patient_ID' is not in the resampled training data
+            if "Patient_ID" in X_train_resampled.columns:
+                logger.warning(
+                    "'Patient_ID' found in resampled training data. Dropping it now."
+                )
+                X_train_resampled = X_train_resampled.drop(columns=["Patient_ID"])
+            else:
+                logger.info(
+                    "'Patient_ID' successfully excluded from resampled training data."
+                )
 
-        # 5.1 Random Forest
-        rf_pipeline = ImbPipeline(
-            [
-                ("scaler", StandardScaler()),
-                (
-                    "random_forest",
-                    RandomForestClassifier(
-                        n_estimators=100,
-                        max_depth=20,
-                        random_state=42,
-                        class_weight="balanced",
-                        n_jobs=-1,
+            # Similarly, ensure 'Patient_ID' is not in validation and test sets
+            for dataset_name, dataset in [("validation", X_val), ("test", X_test)]:
+                if "Patient_ID" in dataset.columns:
+                    logger.warning(
+                        f"'Patient_ID' found in {dataset_name} data. Dropping it now."
+                    )
+                    dataset = dataset.drop(columns=["Patient_ID"])
+                    if dataset_name == "validation":
+                        X_val = dataset
+                    else:
+                        X_test = dataset
+                else:
+                    logger.info(
+                        f"'Patient_ID' successfully excluded from {dataset_name} data."
+                    )
+
+            # Plot resampled class distribution
+            plot_class_distribution(
+                y=y_train_resampled,
+                model_name="Resampled Training Data",
+                report_dir="reports/evaluations",
+                title_suffix="_after_resampling",
+            )
+
+            log_memory(logger, "After SMOTEENN")
+
+        # Step 5: Model Training
+        with log_step(logger, "Model Training"):
+            # Initialize tracking variables
+            models = {}
+            best_score = 0
+            best_model_name = None
+
+            # Define models and their configurations inside main to access runtime variables
+            models_config = {
+                "Random Forest (Tuned)": {
+                    "pipeline": ImbPipeline(
+                        [
+                            (
+                                "random_forest",
+                                RandomForestClassifier(
+                                    random_state=42,
+                                    class_weight="balanced",
+                                    n_jobs=-1,
+                                ),
+                            ),
+                        ]
                     ),
-                ),
-            ]
-        )
-        score, models["Random Forest"] = train_and_evaluate_model(
-            "Random Forest",
-            rf_pipeline,
-            X_train_resampled,
-            y_train_resampled,
-            X_val,
-            y_val,
-            logger,
-        )
-        if score > best_score:
-            best_score = score
-            best_model_name = "Random Forest"
-
-        # After training Random Forest, delete the pipeline and collect garbage
-        del rf_pipeline
-        gc.collect()
-
-        # 5.2 Naive Bayes
-        nb_pipeline = ImbPipeline(
-            [("scaler", StandardScaler()), ("naive_bayes", GaussianNB())]
-        )
-        score, models["Naive Bayes"] = train_and_evaluate_model(
-            "Naive Bayes",
-            nb_pipeline,
-            X_train_resampled,
-            y_train_resampled,
-            X_val,
-            y_val,
-            logger,
-        )
-        if score > best_score:
-            best_score = score
-            best_model_name = "Naive Bayes"
-
-        # After training Naive Bayes, delete the pipeline and collect garbage
-        del nb_pipeline
-        gc.collect()
-
-        # 5.3 KNN
-        knn_pipeline = ImbPipeline(
-            [
-                ("scaler", StandardScaler()),
-                (
-                    "knn",
-                    KNeighborsClassifier(
-                        n_neighbors=5,
-                        weights="distance",
-                        algorithm="auto",
-                        leaf_size=30,
-                        p=2,
-                        n_jobs=-1,
-                        metric="minkowski",
+                    "param_dist": {
+                        "random_forest__n_estimators": randint(100, 500),
+                        "random_forest__max_depth": [None] + list(range(10, 31, 5)),
+                        "random_forest__min_samples_split": randint(2, 11),
+                        "random_forest__min_samples_leaf": randint(1, 5),
+                        "random_forest__max_features": ["sqrt", "log2"],
+                    },
+                    "scoring": "f1",
+                    "cv": StratifiedKFold(n_splits=5, shuffle=True, random_state=42),
+                },
+                "Naive Bayes": {
+                    "pipeline": ImbPipeline(
+                        [
+                            ("naive_bayes", GaussianNB()),
+                        ]
                     ),
-                ),
-            ]
-        )
-        score, models["KNN"] = train_and_evaluate_model(
-            "KNN",
-            knn_pipeline,
-            X_train_resampled,
-            y_train_resampled,
-            X_val,
-            y_val,
-            logger,
-        )
-        if score > best_score:
-            best_score = score
-            best_model_name = "KNN"
-
-        # After training KNN, delete the pipeline and collect garbage
-        del knn_pipeline
-        gc.collect()
-
-        # 5.4 Logistic Regression
-        lr_model = train_logistic_regression(X_train_resampled, y_train_resampled)
-        lr_pipeline = ImbPipeline(
-            [("scaler", StandardScaler()), ("logistic_regression", lr_model)]
-        )
-        score, models["Logistic Regression"] = train_and_evaluate_model(
-            "Logistic Regression",
-            lr_pipeline,
-            X_train_resampled,
-            y_train_resampled,
-            X_val,
-            y_val,
-            logger,
-        )
-        if score > best_score:
-            best_score = score
-            best_model_name = "Logistic Regression"
-
-        # After training Logistic Regression, delete the pipeline and collect garbage
-        del lr_pipeline
-        gc.collect()
-
-        # 5.5 XGBoost
-        try:
-            logger.info("Training XGBoost model")
-
-            # Convert data to numpy arrays using .to_numpy() for consistency
-            X_train_array = X_train_resampled.to_numpy()
-            y_train_array = y_train_resampled.to_numpy()
-            X_val_array = X_val.to_numpy()
-            y_val_array = y_val.to_numpy()
-
-            # XGBoost parameters
-            xgb_params = {
-                "max_depth": 6,
-                "min_child_weight": 1,
-                "eta": 0.05,
-                "subsample": 0.8,
-                "colsample_bytree": 0.8,
-                "objective": "binary:logistic",
-                "eval_metric": ["auc", "error"],
-                "alpha": 1,
-                "lambda": 1,
-                "tree_method": "hist",
-                "random_state": 42,
+                    "scoring": "f1",
+                },
+                "KNN": {
+                    "pipeline": ImbPipeline(
+                        [
+                            (
+                                "knn",
+                                KNeighborsClassifier(
+                                    n_neighbors=5,
+                                    weights="distance",
+                                    algorithm="auto",
+                                    n_jobs=-1,
+                                ),
+                            ),
+                        ]
+                    ),
+                    "scoring": "f1",
+                },
+                "Logistic Regression": {
+                    "pipeline": ImbPipeline(
+                        [
+                            (
+                                "logistic_regression",
+                                train_logistic_regression(
+                                    X_train_resampled, y_train_resampled
+                                ),
+                            ),
+                        ]
+                    ),
+                    "scoring": "f1",
+                },
+                "XGBoost": {
+                    "pipeline": None,  # Handled separately
+                },
             }
 
-            # Create DMatrix objects
-            dtrain = xgb.DMatrix(X_train_array, label=y_train_array)
-            dval = xgb.DMatrix(X_val_array, label=y_val_array)
+            # Log memory before model training
+            log_memory(logger, "Before Model Training")
 
-            # Prepare watchlist for evaluation
-            watchlist = [(dtrain, "train"), (dval, "eval")]
-
-            # Train XGBoost model
-            xgb_model = xgb.train(
-                params=xgb_params,
-                dtrain=dtrain,
-                num_boost_round=200,
-                evals=watchlist,
-                early_stopping_rounds=20,
-                verbose_eval=False,  # Suppress training logs
+            # Total models to train (excluding XGBoost)
+            total_models = len(
+                [model for model in models_config.items() if model[0] != "XGBoost"]
             )
 
-            # Make predictions
-            y_pred_proba = xgb_model.predict(dval)
-            y_pred = (y_pred_proba > 0.5).astype(int)
+            for idx, (model_name, config) in enumerate(models_config.items(), 1):
+                if model_name == "XGBoost":
+                    continue  # Handle separately
 
-            # Calculate metrics (only F1 Score for selection)
-            score = f1_score(y_val, y_pred)
-            models["XGBoost"] = xgb_model
+                pipeline = config["pipeline"]
+                scoring = config.get("scoring", "f1")
 
-            # Update best model if necessary
-            if score > best_score:
-                best_score = score
-                best_model_name = "XGBoost"
+                if model_name == "Random Forest (Tuned)":
+                    param_dist = config["param_dist"]
+                    cv_strategy = config["cv"]
+                    n_iter = 5
 
-            # Log XGBoost specific metrics using evaluate_model
-            evaluate_model(
-                y_val,
-                y_pred,
-                model_name="xgboost",
-                logger=None,
-                y_pred_proba=y_pred_proba,
-                model=xgb_model,
-                X_features=X_val,  # Pass feature set for SHAP
-            )
+                    random_search = RandomizedSearchCV(
+                        estimator=pipeline,
+                        param_distributions=param_dist,
+                        n_iter=n_iter,
+                        scoring=scoring,
+                        cv=cv_strategy,
+                        verbose=3,
+                        random_state=42,
+                        n_jobs=-1,
+                        error_score="raise",
+                    )
 
-            # Log the artifact saving
-            logger.info(f"Saved evaluation artifacts for XGBoost\n")
+                    try:
+                        logger.info(
+                            f"Starting hyperparameter tuning for {model_name} (Model {idx}/{total_models})"
+                        )
+                        log_memory(logger, f"Before tuning {model_name}")
+                        random_search.fit(X_train_resampled, y_train_resampled)
+                        logger.info(
+                            f"Best parameters found: {random_search.best_params_}"
+                        )
+                        logger.info(
+                            f"Best {scoring.capitalize()} from tuning: {random_search.best_score_:.4f}"
+                        )
+                        log_memory(logger, f"After tuning {model_name}")
+                    except Exception as e:
+                        logger.error(
+                            f"Hyperparameter tuning failed for {model_name}: {e}",
+                            exc_info=True,
+                        )
+                        continue  # Skip to next model
 
-            # After training XGBoost, delete DMatrix objects and model if not needed
-            del dtrain, dval, xgb_model
-            gc.collect()
+                    # Evaluate the best estimator on the validation set
+                    best_estimator = random_search.best_estimator_
+                    y_pred = best_estimator.predict(X_val)
+                    y_pred_proba = best_estimator.predict_proba(X_val)[:, 1]
 
-        except Exception as e:
-            logger.error(f"Error in XGBoost training: {str(e)}", exc_info=True)
-            logger.info("Skipping XGBoost due to error")
+                    # Evaluate
+                    metrics = evaluate_model(
+                        y_true=y_val,
+                        y_pred=y_pred,
+                        model_name=model_name.lower().replace(" ", "_"),
+                        y_pred_proba=y_pred_proba,
+                        model=best_estimator,
+                    )
 
-        # Step 6: Final evaluation on test set
-        logger.info(f"\nPerforming final evaluation with best model: {best_model_name}")
-        best_model = models[best_model_name]
+                    # Update best score and model
+                    if metrics.get("F1 Score", 0.0) > best_score:
+                        best_score = metrics["F1 Score"]
+                        best_model_name = model_name
+                        models[model_name] = best_estimator
 
-        if best_model_name == "XGBoost":
-            # Convert test data to numpy array using .to_numpy()
-            X_test_array = X_test.to_numpy()
-            dtest = xgb.DMatrix(X_test_array)
-            final_predictions_proba = best_model.predict(dtest)
-            final_predictions = (final_predictions_proba > 0.5).astype(int)
+                    # Save hyperparameters
+                    best_params = random_search.best_params_
+                    with open(
+                        os.path.join(
+                            "reports/evaluations",
+                            f"{model_name.lower().replace(' ', '_')}_params.json",
+                        ),
+                        "w",
+                    ) as f:
+                        json.dump(best_params, f, indent=4)
 
-            # Clean up DMatrix
-            del dtest
-            gc.collect()
+                    logger.info(
+                        f"Hyperparameter tuning for {model_name} completed successfully."
+                    )
 
-            # Evaluate using y_pred_proba
-            evaluate_model(
-                y_test,
-                final_predictions,
-                model_name=f"final_{best_model_name.lower().replace(' ', '_')}",
-                logger=logger,
-                y_pred_proba=final_predictions_proba,
-                model=best_model,
-                X_features=X_test,  # Pass feature set for SHAP
-            )
-        else:
-            final_predictions = best_model.predict(X_test)
+                else:
+                    # Train and evaluate other models
+                    logger.info(f"Training model {idx}/{total_models}: {model_name}")
+                    log_memory(logger, f"Before training {model_name}")
+                    score, trained_model = train_and_evaluate_model(
+                        model_name,
+                        config["pipeline"],
+                        X_train_resampled,
+                        y_train_resampled,
+                        X_val,
+                        y_val,
+                    )
+                    log_memory(logger, f"After training {model_name}")
 
-            # Evaluate without y_pred_proba
-            evaluate_model(
-                y_test,
-                final_predictions,
-                model_name=f"final_{best_model_name.lower().replace(' ', '_')}",
-                logger=logger,
-                model=best_model,
-                X_features=X_test,  # Pass feature set for SHAP if applicable
-            )
+                    if score > best_score:
+                        best_score = score
+                        best_model_name = model_name
+                        models[model_name] = trained_model
 
-        # Step 7: Save the best model
-        logger.info(f"Saving the best model ({best_model_name})")
-        model_dir = "models"
-        os.makedirs(model_dir, exist_ok=True)
-        model_path = os.path.join(
-            model_dir, f"best_model_{best_model_name.lower().replace(' ', '_')}.pkl"
-        )
-        joblib.dump(best_model, model_path)
-        logger.info(f"Model saved to {model_path}")
+            # Step 5.5: XGBoost
+            with log_step(logger, "XGBoost Training"):
+                try:
+                    logger.info("Training XGBoost model")
+                    log_memory(logger, "Before XGBoost Training")
 
-        # Optionally, delete the best model from memory if no longer needed
-        del best_model
-        gc.collect()
+                    # Initialize XGBClassifier for consistency
+                    xgb_pipeline = ImbPipeline(
+                        [
+                            (
+                                "xgboost",
+                                xgb.XGBClassifier(
+                                    use_label_encoder=False,
+                                    eval_metric="logloss",
+                                    random_state=42,
+                                    n_jobs=-1,
+                                    enable_categorical=True,  # Added parameter
+                                ),
+                            ),
+                        ]
+                    )
 
-        logger.info("Sepsis Prediction Pipeline completed successfully.")
+                    # Define parameters (can be tuned similarly)
+                    xgb_param_dist = {
+                        "xgboost__n_estimators": randint(100, 500),
+                        "xgboost__max_depth": randint(3, 15),
+                        "xgboost__learning_rate": uniform(0.01, 0.3),
+                        "xgboost__subsample": uniform(0.5, 0.5),
+                        "xgboost__colsample_bytree": uniform(0.5, 0.5),
+                        "xgboost__gamma": uniform(0, 5),
+                    }
+
+                    # Initialize RandomizedSearchCV for XGBoost
+                    xgb_random_search = RandomizedSearchCV(
+                        estimator=xgb_pipeline,
+                        param_distributions=xgb_param_dist,
+                        n_iter=20,
+                        scoring="f1",
+                        cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=42),
+                        verbose=3,
+                        random_state=42,
+                        n_jobs=-1,
+                        error_score="raise",
+                    )
+
+                    # Fit RandomizedSearchCV
+                    logger.info("Starting hyperparameter tuning for XGBoost")
+                    xgb_random_search.fit(X_train_resampled, y_train_resampled)
+                    logger.info(
+                        f"Best parameters found for XGBoost: {xgb_random_search.best_params_}"
+                    )
+                    logger.info(
+                        f"Best F1 Score from tuning XGBoost: {xgb_random_search.best_score_:.4f}"
+                    )
+
+                    # Evaluate the best estimator on the validation set
+                    best_xgb_model = xgb_random_search.best_estimator_
+                    y_pred = best_xgb_model.predict(X_val)
+                    y_pred_proba = best_xgb_model.predict_proba(X_val)[:, 1]
+
+                    # Evaluate
+                    metrics = evaluate_model(
+                        y_true=y_val,
+                        y_pred=y_pred,
+                        model_name="xgboost",
+                        y_pred_proba=y_pred_proba,
+                        model=best_xgb_model,
+                    )
+
+                    # Update best score and model
+                    if metrics.get("F1 Score", 0.0) > best_score:
+                        best_score = metrics["F1 Score"]
+                        best_model_name = "XGBoost"
+                        models["XGBoost"] = best_xgb_model
+
+                    # Save hyperparameters
+                    best_xgb_params = xgb_random_search.best_params_
+                    with open(
+                        os.path.join("reports/evaluations", "xgboost_params.json"), "w"
+                    ) as f:
+                        json.dump(best_xgb_params, f, indent=4)
+
+                    logger.info(
+                        "Hyperparameter tuning for XGBoost completed successfully."
+                    )
+                    log_memory(logger, "After XGBoost Training")
+
+                except Exception as e:
+                    logger.error(f"Error in XGBoost training: {str(e)}", exc_info=True)
+
+            # Step 6: Final evaluation on test set
+            with log_step(logger, "Final Evaluation on Test Set"):
+                log_memory(logger, "Before Final Evaluation")
+                if best_model_name is not None:
+                    logger.info(
+                        f"\nPerforming final evaluation with best model: {best_model_name}"
+                    )
+                    best_model = models[best_model_name]
+
+                    if best_model_name == "XGBoost":
+                        # For XGBoost, use predict_proba if available
+                        y_pred_proba = best_model.predict_proba(X_test)[:, 1]
+                        final_predictions = (y_pred_proba > 0.5).astype(int)
+                    else:
+                        # For other models
+                        y_pred_proba = (
+                            best_model.predict_proba(X_test)[:, 1]
+                            if hasattr(best_model, "predict_proba")
+                            else None
+                        )
+                        final_predictions = best_model.predict(X_test)
+
+                    # Evaluate
+                    evaluate_model(
+                        y_true=y_test,
+                        y_pred=final_predictions,
+                        model_name=f"final_{best_model_name.lower()}",
+                        y_pred_proba=y_pred_proba,
+                        model=best_model,
+                    )
+
+                    # Step 7: Save the best model
+                    with log_step(logger, "Saving the Best Model"):
+                        logger.info(f"Saving the best model ({best_model_name})")
+                        model_dir = "models"
+                        os.makedirs(model_dir, exist_ok=True)
+                        model_path = os.path.join(
+                            model_dir, f"best_model_{best_model_name.lower()}.pkl"
+                        )
+                        joblib.dump(best_model, model_path)
+                        logger.info(f"Model saved to {model_path}")
+
+                    # Clean up
+                    del best_model
+                    gc.collect()
+                    logger.info("Cleaned up best model from memory")
+                    log_memory(logger, "After Final Evaluation and Model Saving")
+
+                    logger.info("Sepsis Prediction Pipeline completed successfully.")
+
+                else:
+                    logger.warning("No model was successfully trained and evaluated.")
+                    log_memory(logger, "After Final Evaluation - No Model Trained")
 
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}", exc_info=True)

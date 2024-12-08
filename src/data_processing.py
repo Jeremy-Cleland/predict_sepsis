@@ -8,6 +8,8 @@ import pandas as pd
 
 from src.logger_config import get_logger
 
+from src.feature_engineering import analyze_and_drop_columns
+
 logger = get_logger("sepsis_prediction.data_processing")
 
 
@@ -149,13 +151,35 @@ def split_data(
         sepsis_rate = df.groupby("Patient_ID")["SepsisLabel"].max().mean()
         logger.info(f"{name} set sepsis rate: {sepsis_rate:.1%}")
 
-    # Save the split datasets
+    # Analyze and drop columns in training set
+    logger.info("Analyzing and dropping columns in training set")
+    df_train_processed, drop_analysis = analyze_and_drop_columns(df_train)
+
+    # Aggregate all columns to drop
+    all_drops = (
+        drop_analysis.get("index", [])
+        + list(drop_analysis.get("high_missing", {}).keys())
+        + list(drop_analysis.get("high_correlation", {}).keys())
+        + list(drop_analysis.get("clinical_redundancy", {}).keys())
+    )
+
+    # Drop the same columns from validation and test sets
+    if val_patients is not None:
+        df_val = df_val.drop(columns=all_drops, errors="ignore")
+    if test_patients is not None:
+        df_test = df_test.drop(columns=all_drops, errors="ignore")
+
+    # Save the processed split datasets
     os.makedirs("data/processed", exist_ok=True)
-    df_train.to_csv("data/processed/train_data.csv", index=False)
+    df_train_processed.to_csv("data/processed/train_data.csv", index=False)
     df_val.to_csv("data/processed/val_data.csv", index=False)
     df_test.to_csv("data/processed/test_data.csv", index=False)
 
-    return df_train, df_val, df_test
+    logger.info(
+        "Dropped the same columns from validation and test sets to maintain consistency."
+    )
+    logger.info(f"Columns dropped from all datasets: {all_drops}")
+    return df_train_processed, df_val, df_test
 
 
 def load_processed_data(
