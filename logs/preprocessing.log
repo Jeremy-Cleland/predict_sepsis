@@ -1,0 +1,8 @@
+12-07 14:44 - Starting preprocessing pipeline
+12-07 14:44 - After dropping columns: 30 features remaining
+12-07 14:44 - Starting missing value handling
+12-07 14:45 - Completed forward-filling for 7 vital signs
+12-07 14:45 - Created missing value indicators for lab values
+12-07 14:45 - Starting parallel imputation
+12-07 14:47 - Completed parallel imputation successfully
+12-07 14:47 - Completed missing value imputation

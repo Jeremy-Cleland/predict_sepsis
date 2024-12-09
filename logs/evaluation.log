@@ -1,0 +1,110 @@
+{"asctime": "2024-12-08 06:05:37,986", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nrandom_forest_(tuned) Evaluation:"}
+{"asctime": "2024-12-08 06:05:37,988", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.9820"}
+{"asctime": "2024-12-08 06:05:37,988", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.1875"}
+{"asctime": "2024-12-08 06:05:37,988", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.0007"}
+{"asctime": "2024-12-08 06:05:37,988", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.0014"}
+{"asctime": "2024-12-08 06:05:37,988", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.0180"}
+{"asctime": "2024-12-08 06:05:37,988", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.1341"}
+{"asctime": "2024-12-08 06:05:37,988", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.7582"}
+{"asctime": "2024-12-08 06:05:38,846", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for random_forest_(tuned): Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 06:05:38,847", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/random_forest_(tuned)_metrics.json\n"}
+{"asctime": "2024-12-08 06:05:42,445", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nnaive_bayes Evaluation:"}
+{"asctime": "2024-12-08 06:05:42,446", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.9346"}
+{"asctime": "2024-12-08 06:05:42,446", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.0873"}
+{"asctime": "2024-12-08 06:05:42,446", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.2793"}
+{"asctime": "2024-12-08 06:05:42,446", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.1330"}
+{"asctime": "2024-12-08 06:05:42,446", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.0654"}
+{"asctime": "2024-12-08 06:05:42,446", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.2557"}
+{"asctime": "2024-12-08 06:05:42,446", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.6954"}
+{"asctime": "2024-12-08 06:05:42,891", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for naive_bayes: Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 06:05:42,892", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/naive_bayes_metrics.json\n"}
+{"asctime": "2024-12-08 06:10:19,262", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nknn Evaluation:"}
+{"asctime": "2024-12-08 06:10:19,263", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.9417"}
+{"asctime": "2024-12-08 06:10:19,264", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.0557"}
+{"asctime": "2024-12-08 06:10:19,264", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.1409"}
+{"asctime": "2024-12-08 06:10:19,264", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.0799"}
+{"asctime": "2024-12-08 06:10:19,264", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.0583"}
+{"asctime": "2024-12-08 06:10:19,265", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.2414"}
+{"asctime": "2024-12-08 06:10:19,265", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.5521"}
+{"asctime": "2024-12-08 06:10:19,627", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for knn: Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 06:10:19,628", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/knn_metrics.json\n"}
+{"asctime": "2024-12-08 06:11:22,461", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nlogistic_regression Evaluation:"}
+{"asctime": "2024-12-08 06:11:22,462", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.7532"}
+{"asctime": "2024-12-08 06:11:22,462", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.0435"}
+{"asctime": "2024-12-08 06:11:22,462", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.6067"}
+{"asctime": "2024-12-08 06:11:22,463", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.0811"}
+{"asctime": "2024-12-08 06:11:22,463", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.2468"}
+{"asctime": "2024-12-08 06:11:22,463", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.4968"}
+{"asctime": "2024-12-08 06:11:22,463", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.7296"}
+{"asctime": "2024-12-08 06:11:22,901", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for logistic_regression: Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 06:11:22,901", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/logistic_regression_metrics.json\n"}
+{"asctime": "2024-12-08 06:11:25,282", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nfinal_naive bayes Evaluation:"}
+{"asctime": "2024-12-08 06:11:25,283", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.9425"}
+{"asctime": "2024-12-08 06:11:25,283", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.0982"}
+{"asctime": "2024-12-08 06:11:25,283", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.2677"}
+{"asctime": "2024-12-08 06:11:25,283", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.1437"}
+{"asctime": "2024-12-08 06:11:25,283", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.0575"}
+{"asctime": "2024-12-08 06:11:25,283", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.2398"}
+{"asctime": "2024-12-08 06:11:25,283", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.7042"}
+{"asctime": "2024-12-08 06:11:25,724", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for final_naive bayes: Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 06:11:25,724", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/final_naive bayes_metrics.json\n"}
+{"asctime": "2024-12-08 14:01:39,055", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nrandom_forest_(tuned) Evaluation:"}
+{"asctime": "2024-12-08 14:01:39,057", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.9764"}
+{"asctime": "2024-12-08 14:01:39,057", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.1380"}
+{"asctime": "2024-12-08 14:01:39,057", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.0596"}
+{"asctime": "2024-12-08 14:01:39,057", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.0833"}
+{"asctime": "2024-12-08 14:01:39,057", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.0236"}
+{"asctime": "2024-12-08 14:01:39,057", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.1535"}
+{"asctime": "2024-12-08 14:01:39,057", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.7583"}
+{"asctime": "2024-12-08 14:01:39,707", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for random_forest_(tuned): Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 14:01:39,708", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/random_forest_(tuned)_metrics.json\n"}
+{"asctime": "2024-12-08 14:01:40,428", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nnaive_bayes Evaluation:"}
+{"asctime": "2024-12-08 14:01:40,428", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.8402"}
+{"asctime": "2024-12-08 14:01:40,428", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.0449"}
+{"asctime": "2024-12-08 14:01:40,428", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.3900"}
+{"asctime": "2024-12-08 14:01:40,429", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.0806"}
+{"asctime": "2024-12-08 14:01:40,429", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.1598"}
+{"asctime": "2024-12-08 14:01:40,429", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.3997"}
+{"asctime": "2024-12-08 14:01:40,429", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.7087"}
+{"asctime": "2024-12-08 14:01:40,869", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for naive_bayes: Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 14:01:40,869", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/naive_bayes_metrics.json\n"}
+{"asctime": "2024-12-08 14:05:57,539", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nknn Evaluation:"}
+{"asctime": "2024-12-08 14:05:57,540", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.8907"}
+{"asctime": "2024-12-08 14:05:57,540", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.0492"}
+{"asctime": "2024-12-08 14:05:57,540", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.2774"}
+{"asctime": "2024-12-08 14:05:57,540", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.0836"}
+{"asctime": "2024-12-08 14:05:57,540", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.1093"}
+{"asctime": "2024-12-08 14:05:57,540", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.3305"}
+{"asctime": "2024-12-08 14:05:57,540", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.6197"}
+{"asctime": "2024-12-08 14:05:57,947", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for knn: Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 14:05:57,948", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/knn_metrics.json\n"}
+{"asctime": "2024-12-08 14:06:23,494", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nlogistic_regression Evaluation:"}
+{"asctime": "2024-12-08 14:06:23,495", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.7618"}
+{"asctime": "2024-12-08 14:06:23,495", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.0452"}
+{"asctime": "2024-12-08 14:06:23,495", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.6093"}
+{"asctime": "2024-12-08 14:06:23,495", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.0841"}
+{"asctime": "2024-12-08 14:06:23,495", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.2382"}
+{"asctime": "2024-12-08 14:06:23,495", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.4880"}
+{"asctime": "2024-12-08 14:06:23,495", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.7321"}
+{"asctime": "2024-12-08 14:06:23,959", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for logistic_regression: Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 14:06:23,960", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/logistic_regression_metrics.json\n"}
+{"asctime": "2024-12-08 14:14:40,977", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nxgboost Evaluation:"}
+{"asctime": "2024-12-08 14:14:40,979", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.9721"}
+{"asctime": "2024-12-08 14:14:40,979", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.1116"}
+{"asctime": "2024-12-08 14:14:40,979", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.0793"}
+{"asctime": "2024-12-08 14:14:40,979", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.0928"}
+{"asctime": "2024-12-08 14:14:40,979", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.0279"}
+{"asctime": "2024-12-08 14:14:40,979", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.1669"}
+{"asctime": "2024-12-08 14:14:40,979", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.7182"}
+{"asctime": "2024-12-08 14:14:41,563", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for xgboost: Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 14:14:41,564", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/xgboost_metrics.json\n"}
+{"asctime": "2024-12-08 14:14:41,859", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "\nfinal_xgboost Evaluation:"}
+{"asctime": "2024-12-08 14:14:41,860", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Accuracy                  : 0.9720"}
+{"asctime": "2024-12-08 14:14:41,860", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Precision                 : 0.1254"}
+{"asctime": "2024-12-08 14:14:41,860", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Recall                    : 0.0923"}
+{"asctime": "2024-12-08 14:14:41,860", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  F1 Score                  : 0.1063"}
+{"asctime": "2024-12-08 14:14:41,860", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Mean Absolute Error       : 0.0280"}
+{"asctime": "2024-12-08 14:14:41,860", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  Root Mean Squared Error   : 0.1672"}
+{"asctime": "2024-12-08 14:14:41,860", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "  AUC-ROC                   : 0.7097"}
+{"asctime": "2024-12-08 14:14:42,324", "name": "sepsis_prediction.evaluation", "levelname": "WARNING", "message": "Feature importances not available for final_xgboost: Model does not have feature_importances_ attribute."}
+{"asctime": "2024-12-08 14:14:42,325", "name": "sepsis_prediction.evaluation", "levelname": "INFO", "message": "Saved evaluation metrics to reports/evaluations/final_xgboost_metrics.json\n"}

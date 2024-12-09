@@ -1,0 +1,871 @@
+12-07 20:23 - Saved checkpoint to checkpoints/checkpoint_basic_features_0.parquet
+12-07 20:23 - Saved checkpoint to checkpoints/checkpoint_basic_features_1.parquet
+12-07 20:23 - Saved checkpoint to checkpoints/checkpoint_basic_features_2.parquet
+12-07 20:23 - Memory usage: 2332.52 MB
+12-07 20:23 - Handling missing values
+12-07 20:24 - Starting parallel imputation: 10 cores, chunk size: 5000
+12-07 20:24 - Starting Sepsis Prediction Pipeline
+12-07 20:24 - Loading raw data
+12-07 20:24 - Loaded dataset with 1552210 rows and 44 columns
+12-07 20:24 - Splitting data into training, validation, and testing sets
+12-07 20:24 - 
+Data Split Summary:
+12-07 20:24 - --------------------------------------------------
+12-07 20:24 - Training set:   1086116 rows, 28234 unique patients
+12-07 20:24 - Validation set: 234530 rows, 6049 unique patients
+12-07 20:24 - Testing set:    231564 rows, 6053 unique patients
+12-07 20:24 - Training set sepsis rate: 7.3%
+12-07 20:24 - Validation set sepsis rate: 7.3%
+12-07 20:24 - Testing set sepsis rate: 7.3%
+12-07 20:24 - Preprocessing all datasets
+12-07 20:24 - Starting preprocessing pipeline
+12-07 20:24 - Memory usage: 2188.92 MB
+12-07 20:24 - Using 10 parallel jobs
+12-07 20:24 - Analyzing and dropping columns
+12-07 20:24 - 
+Retained 26/48 columns (54.2%)
+12-07 20:24 - Saved checkpoint to checkpoints/checkpoint_after_column_analysis.parquet
+12-07 20:24 - Creating basic features
+12-07 20:25 - Saved checkpoint to checkpoints/checkpoint_basic_features_0.parquet
+12-07 20:25 - Saved checkpoint to checkpoints/checkpoint_basic_features_1.parquet
+12-07 20:25 - Saved checkpoint to checkpoints/checkpoint_basic_features_2.parquet
+12-07 20:25 - Memory usage: 2391.58 MB
+12-07 20:25 - Handling missing values
+12-07 20:25 - Starting parallel imputation: 10 cores, chunk size: 5000
+12-07 20:30 - Imputation complete: 2991.5s, avg 200.0 iterations
+12-07 20:30 - Starting parallel imputation: 10 cores, chunk size: 5000
+12-07 20:30 - Imputation failed for chunk 0: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 1: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 2: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 3: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 4: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 5: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 7: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 6: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 8: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 9: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 10: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 11: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 12: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 13: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 14: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 15: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 16: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 17: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 18: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 19: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 20: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 22: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 21: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:30 - Imputation failed for chunk 23: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:31 - Imputation failed for chunk 45: 'min_value' should be of shape (44,) when an array-like is provided. Got (45,), instead.
+12-07 20:31 - Imputation complete: 424.9s, avg 93.6 iterations
+12-07 20:31 - Error in parallel imputation: all the input array dimensions except for the concatenation axis must match exactly, but along dimension 1, the array at index 0 has size 44 and the array at index 24 has size 45
+12-07 20:31 - Error in preprocessing pipeline: all the input array dimensions except for the concatenation axis must match exactly, but along dimension 1, the array at index 0 has size 44 and the array at index 24 has size 45
+12-07 20:31 - An error occurred: all the input array dimensions except for the concatenation axis must match exactly, but along dimension 1, the array at index 0 has size 44 and the array at index 24 has size 45
+Traceback (most recent call last):
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/main1.py", line 108, in main
+    df_train_processed, df_val_processed, df_test_processed = preprocess_pipeline(
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/src/feature_engineering.py", line 743, in preprocess_pipeline
+    val_df = handle_missing_values_chunk(val_df)
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/src/feature_engineering.py", line 657, in handle_missing_values_chunk
+    imputed_data = parallel_impute(numeric_data, n_jobs=-1)  # Single thread
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/src/feature_engineering.py", line 449, in parallel_impute
+    return np.vstack(imputed_chunks)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/numpy/core/shape_base.py", line 289, in vstack
+    return _nx.concatenate(arrs, 0, dtype=dtype, casting=casting)
+ValueError: all the input array dimensions except for the concatenation axis must match exactly, but along dimension 1, the array at index 0 has size 44 and the array at index 24 has size 45
+12-07 20:34 - Starting Sepsis Prediction Pipeline
+12-07 20:34 - Loading raw data
+12-07 20:34 - Loaded dataset with 1552210 rows and 44 columns
+12-07 20:34 - Splitting data into training, validation, and testing sets
+12-07 20:34 - 
+Data Split Summary:
+12-07 20:34 - --------------------------------------------------
+12-07 20:34 - Training set:   1086116 rows, 28234 unique patients
+12-07 20:34 - Validation set: 234530 rows, 6049 unique patients
+12-07 20:34 - Testing set:    231564 rows, 6053 unique patients
+12-07 20:34 - Training set sepsis rate: 7.3%
+12-07 20:34 - Validation set sepsis rate: 7.3%
+12-07 20:34 - Testing set sepsis rate: 7.3%
+12-07 20:34 - Preprocessing all datasets
+12-07 20:34 - Starting preprocessing pipeline
+12-07 20:34 - Memory usage: 1772.97 MB
+12-07 20:34 - Using 10 parallel jobs
+12-07 20:34 - Analyzing and dropping columns
+12-07 20:34 - 
+Retained 26/48 columns (54.2%)
+12-07 20:34 - Saved checkpoint to checkpoints/checkpoint_after_column_analysis.parquet
+12-07 20:34 - Creating basic features
+12-07 20:35 - Saved checkpoint to checkpoints/checkpoint_basic_features_0.parquet
+12-07 20:35 - Saved checkpoint to checkpoints/checkpoint_basic_features_1.parquet
+12-07 20:35 - Saved checkpoint to checkpoints/checkpoint_basic_features_2.parquet
+12-07 20:35 - Memory usage: 2099.47 MB
+12-07 20:35 - Handling missing values
+12-07 20:35 - Starting Iterative Imputer on the entire dataset
+12-07 20:40 - Imputation completed successfully
+12-07 20:40 - Starting Iterative Imputer on the entire dataset
+12-07 20:41 - Imputation completed successfully
+12-07 20:41 - Starting Iterative Imputer on the entire dataset
+12-07 20:42 - Imputation completed successfully
+12-07 20:42 - Saved checkpoint to checkpoints/checkpoint_after_missing_values.parquet
+12-07 20:42 - Memory usage: 1442.83 MB
+12-07 20:42 - Calculating severity scores
+12-07 20:42 - Saved checkpoint to checkpoints/checkpoint_after_severity_scores.parquet
+12-07 20:42 - Memory usage: 1553.05 MB
+12-07 20:42 - Starting categorical encoding process
+12-07 20:42 - Encoding training data...
+12-07 20:42 - Memory usage: 1553.05 MB
+12-07 20:42 - Starting categorical encoding
+12-07 20:42 - Using chunk size of 50000 for categorical encoding
+12-07 20:42 - Processing column: Gender
+12-07 20:42 - Memory usage: 1948.97 MB
+12-07 20:42 - Found 2 categories for Gender
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-07 20:43 - Memory usage: 1470.20 MB
+12-07 20:43 - Processing column: Unit1
+12-07 20:43 - Memory usage: 1470.20 MB
+12-07 20:43 - Found 2 categories for Unit1
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-07 20:43 - Memory usage: 1489.20 MB
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_encoded_train.parquet
+12-07 20:43 - Encoding validation data...
+12-07 20:43 - Memory usage: 1234.70 MB
+12-07 20:43 - Starting categorical encoding
+12-07 20:43 - Using chunk size of 50000 for categorical encoding
+12-07 20:43 - Processing column: Gender
+12-07 20:43 - Memory usage: 1394.77 MB
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-07 20:43 - Memory usage: 1488.19 MB
+12-07 20:43 - Processing column: Unit1
+12-07 20:43 - Memory usage: 1488.19 MB
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-07 20:43 - Memory usage: 1499.23 MB
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_encoded_val.parquet
+12-07 20:43 - Encoding test data...
+12-07 20:43 - Memory usage: 1482.47 MB
+12-07 20:43 - Starting categorical encoding
+12-07 20:43 - Using chunk size of 50000 for categorical encoding
+12-07 20:43 - Processing column: Gender
+12-07 20:43 - Memory usage: 1604.66 MB
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-07 20:43 - Memory usage: 1587.69 MB
+12-07 20:43 - Processing column: Unit1
+12-07 20:43 - Memory usage: 1587.69 MB
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-07 20:43 - Memory usage: 1592.03 MB
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_encoded_test.parquet
+12-07 20:43 - Scaling numeric features
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_final_train.parquet
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_final_val.parquet
+12-07 20:43 - Saved checkpoint to checkpoints/checkpoint_final_test.parquet
+12-07 20:43 - Applying SMOTEENN to training data
+12-07 20:54 - Starting hyperparameter tuning for Random Forest
+12-08 00:15 - Best parameters found: {'random_forest__max_depth': None, 'random_forest__max_features': 'sqrt', 'random_forest__min_samples_leaf': 2, 'random_forest__min_samples_split': 10, 'random_forest__n_estimators': 445}
+12-08 00:15 - Best F1 Score from tuning: 0.9689
+12-08 00:15 - An error occurred: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- AST
+- Alkalinephos
+- BaseExcess
+- Bilirubin_direct
+- Bilirubin_total
+- ...
+Traceback (most recent call last):
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/main1.py", line 207, in main
+    y_pred_proba = best_rf_model.predict_proba(X_val)[:, 1]
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/imblearn/pipeline.py", line 459, in predict
+    Xt = transform.transform(Xt)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/utils/_set_output.py", line 316, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/preprocessing/_data.py", line 1045, in transform
+    X = self._validate_data(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/base.py", line 608, in _validate_data
+    self._check_feature_names(X, reset=reset)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/base.py", line 535, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names unseen at fit time:
+- AST
+- Alkalinephos
+- BaseExcess
+- Bilirubin_direct
+- Bilirubin_total
+- ...
+
+12-08 00:45 - Starting Sepsis Prediction Pipeline
+12-08 00:45 - Loading raw data
+12-08 00:45 - Loaded dataset with 1552210 rows and 44 columns
+12-08 00:45 - Splitting data into training, validation, and testing sets
+12-08 00:45 - 
+Data Split Summary:
+12-08 00:45 - --------------------------------------------------
+12-08 00:45 - Training set:   1086116 rows, 28234 unique patients
+12-08 00:45 - Validation set: 234530 rows, 6049 unique patients
+12-08 00:45 - Testing set:    231564 rows, 6053 unique patients
+12-08 00:45 - Training set sepsis rate: 7.3%
+12-08 00:45 - Validation set sepsis rate: 7.3%
+12-08 00:45 - Testing set sepsis rate: 7.3%
+12-08 00:45 - Analyzing and dropping columns in training set
+12-08 00:45 - Dropped columns due to high missing rates: dict_keys(['EtCO2', 'HCO3', 'SaO2', 'AST', 'Alkalinephos', 'Chloride', 'Bilirubin_direct', 'Lactate', 'Phosphate', 'Bilirubin_total', 'TroponinI', 'PTT', 'Fibrinogen'])
+12-08 00:45 - Dropped columns due to high correlation: dict_keys(['Bilirubin_direct', 'Hgb', 'Unit2', 'ICULOS'])
+12-08 00:45 - Dropped columns due to clinical redundancy: dict_keys(['HCO3', 'BaseExcess', 'SaO2', 'Bilirubin_direct'])
+12-08 00:45 - 
+Retained 26/48 columns (54.2%)
+12-08 00:46 - Dropped the same columns from validation and test sets to maintain consistency.
+12-08 00:46 - Columns dropped from all datasets: ['Unnamed: 0', 'EtCO2', 'HCO3', 'SaO2', 'AST', 'Alkalinephos', 'Chloride', 'Bilirubin_direct', 'Lactate', 'Phosphate', 'Bilirubin_total', 'TroponinI', 'PTT', 'Fibrinogen', 'Bilirubin_direct', 'Hgb', 'Unit2', 'ICULOS', 'HCO3', 'BaseExcess', 'SaO2', 'Bilirubin_direct']
+12-08 00:46 - Preprocessing all datasets
+12-08 00:46 - Starting preprocessing pipeline
+12-08 00:46 - Memory usage: 1406.39 MB
+12-08 00:46 - Using 10 parallel jobs
+12-08 00:46 - Analyzing and dropping columns
+12-08 00:46 - Dropped columns due to high missing rates: dict_keys([])
+12-08 00:46 - Dropped columns due to high correlation: dict_keys([])
+12-08 00:46 - Dropped columns due to clinical redundancy: dict_keys([])
+12-08 00:46 - 
+Retained 26/26 columns (100.0%)
+12-08 00:46 - Saved checkpoint to checkpoints/checkpoint_after_column_analysis.parquet
+12-08 00:46 - Creating basic features
+12-08 00:46 - Starting Sepsis Prediction Pipeline
+12-08 00:46 - Loading raw data
+12-08 00:46 - Loaded dataset with 1552210 rows and 44 columns
+12-08 00:46 - Splitting data into training, validation, and testing sets
+12-08 00:46 - 
+Data Split Summary:
+12-08 00:46 - --------------------------------------------------
+12-08 00:46 - Training set:   1086116 rows, 28234 unique patients
+12-08 00:46 - Validation set: 234530 rows, 6049 unique patients
+12-08 00:46 - Testing set:    231564 rows, 6053 unique patients
+12-08 00:46 - Training set sepsis rate: 7.3%
+12-08 00:46 - Validation set sepsis rate: 7.3%
+12-08 00:46 - Testing set sepsis rate: 7.3%
+12-08 00:46 - Analyzing and dropping columns in training set
+12-08 00:46 - Dropped columns due to high missing rates: dict_keys(['EtCO2', 'HCO3', 'SaO2', 'AST', 'Alkalinephos', 'Chloride', 'Bilirubin_direct', 'Lactate', 'Phosphate', 'Bilirubin_total', 'TroponinI', 'PTT', 'Fibrinogen'])
+12-08 00:46 - Dropped columns due to high correlation: dict_keys(['Bilirubin_direct', 'Hgb', 'Unit2', 'ICULOS'])
+12-08 00:46 - Dropped columns due to clinical redundancy: dict_keys(['HCO3', 'BaseExcess', 'SaO2', 'Bilirubin_direct'])
+12-08 00:46 - 
+Retained 26/48 columns (54.2%)
+12-08 00:47 - Dropped the same columns from validation and test sets to maintain consistency.
+12-08 00:47 - Columns dropped from all datasets: ['Unnamed: 0', 'EtCO2', 'HCO3', 'SaO2', 'AST', 'Alkalinephos', 'Chloride', 'Bilirubin_direct', 'Lactate', 'Phosphate', 'Bilirubin_total', 'TroponinI', 'PTT', 'Fibrinogen', 'Bilirubin_direct', 'Hgb', 'Unit2', 'ICULOS', 'HCO3', 'BaseExcess', 'SaO2', 'Bilirubin_direct']
+12-08 00:47 - Preprocessing all datasets
+12-08 00:47 - Starting preprocessing pipeline
+12-08 00:47 - Memory usage: 1187.72 MB
+12-08 00:47 - Using 10 parallel jobs
+12-08 00:47 - Analyzing and dropping columns
+12-08 00:47 - Dropped columns due to high missing rates: dict_keys([])
+12-08 00:47 - Dropped columns due to high correlation: dict_keys([])
+12-08 00:47 - Dropped columns due to clinical redundancy: dict_keys([])
+12-08 00:47 - 
+Retained 26/26 columns (100.0%)
+12-08 00:47 - Saved checkpoint to checkpoints/checkpoint_after_column_analysis.parquet
+12-08 00:47 - Creating basic features
+12-08 00:47 - Saved checkpoint to checkpoints/checkpoint_basic_features_0.parquet
+12-08 00:48 - Saved checkpoint to checkpoints/checkpoint_basic_features_1.parquet
+12-08 00:48 - Saved checkpoint to checkpoints/checkpoint_basic_features_2.parquet
+12-08 00:48 - Memory usage: 2203.83 MB
+12-08 00:48 - Handling missing values
+12-08 00:48 - Starting Iterative Imputer on the entire dataset
+12-08 00:52 - Imputation completed successfully
+12-08 00:52 - Starting Iterative Imputer on the entire dataset
+12-08 00:53 - Imputation completed successfully
+12-08 00:53 - Starting Iterative Imputer on the entire dataset
+12-08 00:54 - Imputation completed successfully
+12-08 00:54 - Saved checkpoint to checkpoints/checkpoint_after_missing_values.parquet
+12-08 00:54 - Memory usage: 1867.08 MB
+12-08 00:54 - Calculating severity scores
+12-08 00:54 - Saved checkpoint to checkpoints/checkpoint_after_severity_scores.parquet
+12-08 00:54 - Memory usage: 1707.11 MB
+12-08 00:54 - Starting categorical encoding process
+12-08 00:54 - Encoding training data...
+12-08 00:54 - Memory usage: 1707.11 MB
+12-08 00:54 - Starting categorical encoding
+12-08 00:54 - Using chunk size of 50000 for categorical encoding
+12-08 00:54 - Processing column: Gender
+12-08 00:54 - Memory usage: 2158.91 MB
+12-08 00:54 - Found 2 categories for Gender
+12-08 00:54 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 00:54 - Memory usage: 2201.97 MB
+12-08 00:54 - Processing column: Unit1
+12-08 00:54 - Memory usage: 2201.97 MB
+12-08 00:54 - Found 2 categories for Unit1
+12-08 00:55 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 00:55 - Memory usage: 2212.14 MB
+12-08 00:55 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 00:55 - Saved checkpoint to checkpoints/checkpoint_encoded_train.parquet
+12-08 00:55 - Encoding validation data...
+12-08 00:55 - Memory usage: 1949.64 MB
+12-08 00:55 - Starting categorical encoding
+12-08 00:55 - Using chunk size of 50000 for categorical encoding
+12-08 00:55 - Processing column: Gender
+12-08 00:55 - Memory usage: 1947.12 MB
+12-08 00:55 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 00:55 - Memory usage: 1958.62 MB
+12-08 00:55 - Processing column: Unit1
+12-08 00:55 - Memory usage: 1958.62 MB
+12-08 00:55 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 00:55 - Memory usage: 1960.23 MB
+12-08 00:55 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 00:55 - Error in categorical encoding: 'tuple' object has no attribute 'to_parquet'
+12-08 00:55 - Error in preprocessing pipeline: 'tuple' object has no attribute 'to_parquet'
+12-08 00:55 - An error occurred: 'tuple' object has no attribute 'to_parquet'
+Traceback (most recent call last):
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/main.py", line 131, in main
+    df_train_processed, df_val_processed, df_test_processed = preprocess_pipeline(
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/src/feature_engineering.py", line 817, in preprocess_pipeline
+    save_checkpoint(val_df, "encoded_val")
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/src/feature_engineering.py", line 488, in save_checkpoint
+    df.to_parquet(checkpoint_path)
+AttributeError: 'tuple' object has no attribute 'to_parquet'
+12-08 01:10 - Starting Sepsis Prediction Pipeline
+12-08 01:10 - Loading raw data
+12-08 01:10 - Loaded dataset with 1552210 rows and 44 columns
+12-08 01:10 - Splitting data into training, validation, and testing sets
+12-08 01:10 - 
+Data Split Summary:
+12-08 01:10 - --------------------------------------------------
+12-08 01:10 - Training set:   1086116 rows, 28234 unique patients
+12-08 01:10 - Validation set: 234530 rows, 6049 unique patients
+12-08 01:10 - Testing set:    231564 rows, 6053 unique patients
+12-08 01:10 - Training set sepsis rate: 7.3%
+12-08 01:10 - Validation set sepsis rate: 7.3%
+12-08 01:10 - Testing set sepsis rate: 7.3%
+12-08 01:10 - Analyzing and dropping columns in training set
+12-08 01:10 - Dropped columns due to high missing rates: {'TroponinI', 'Bilirubin_direct', 'Phosphate', 'Chloride', 'Lactate', 'SaO2', 'Alkalinephos', 'Bilirubin_total', 'Fibrinogen', 'EtCO2', 'AST', 'PTT', 'HCO3'}
+12-08 01:10 - Dropped columns due to high correlation: {'Unit2', 'Hgb', 'Bilirubin_direct', 'ICULOS'}
+12-08 01:10 - Dropped columns due to clinical redundancy: {'SaO2', 'Bilirubin_direct', 'BaseExcess', 'HCO3'}
+12-08 01:10 - 
+Retained 26/44 columns (59.1%)
+12-08 01:11 - Dropped the same columns from validation and test sets to maintain consistency.
+12-08 01:11 - Columns dropped from all datasets: ['Unnamed: 0', 'EtCO2', 'HCO3', 'SaO2', 'AST', 'Alkalinephos', 'Chloride', 'Bilirubin_direct', 'Lactate', 'Phosphate', 'Bilirubin_total', 'TroponinI', 'PTT', 'Fibrinogen', 'Bilirubin_direct', 'Hgb', 'Unit2', 'ICULOS', 'HCO3', 'BaseExcess', 'SaO2', 'Bilirubin_direct']
+12-08 01:11 - Preprocessing all datasets
+12-08 01:11 - Starting preprocessing pipeline
+12-08 01:11 - Memory usage: 1403.30 MB
+12-08 01:11 - Using 10 parallel jobs
+12-08 01:11 - Analyzing and dropping columns
+12-08 01:11 - Dropped columns due to high missing rates: set()
+12-08 01:11 - Dropped columns due to high correlation: set()
+12-08 01:11 - Dropped columns due to clinical redundancy: set()
+12-08 01:11 - 
+Retained 26/26 columns (100.0%)
+12-08 01:11 - Saved checkpoint to checkpoints/checkpoint_after_column_analysis.parquet
+12-08 01:11 - Creating basic features
+12-08 01:11 - Saved checkpoint to checkpoints/checkpoint_basic_features_0.parquet
+12-08 01:12 - Saved checkpoint to checkpoints/checkpoint_basic_features_1.parquet
+12-08 01:12 - Saved checkpoint to checkpoints/checkpoint_basic_features_2.parquet
+12-08 01:12 - Memory usage: 2237.39 MB
+12-08 01:12 - Handling missing values
+12-08 01:12 - Starting Iterative Imputer on the entire dataset
+12-08 01:16 - Imputation completed successfully
+12-08 01:16 - Starting Iterative Imputer on the entire dataset
+12-08 01:17 - Imputation completed successfully
+12-08 01:17 - Starting Iterative Imputer on the entire dataset
+12-08 01:18 - Imputation completed successfully
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_after_missing_values.parquet
+12-08 01:18 - Memory usage: 1494.50 MB
+12-08 01:18 - Calculating severity scores
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_after_severity_scores.parquet
+12-08 01:18 - Memory usage: 1494.41 MB
+12-08 01:18 - Starting categorical encoding process
+12-08 01:18 - Encoding training data...
+12-08 01:18 - Memory usage: 1494.41 MB
+12-08 01:18 - Starting categorical encoding
+12-08 01:18 - Using chunk size of 50000 for categorical encoding
+12-08 01:18 - Processing column: Gender
+12-08 01:18 - Memory usage: 1946.20 MB
+12-08 01:18 - Found 2 categories for Gender
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 01:18 - Memory usage: 1977.58 MB
+12-08 01:18 - Processing column: Unit1
+12-08 01:18 - Memory usage: 1977.58 MB
+12-08 01:18 - Found 2 categories for Unit1
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 01:18 - Memory usage: 1917.45 MB
+12-08 01:18 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_encoded_train.parquet
+12-08 01:18 - Encoding validation data...
+12-08 01:18 - Memory usage: 1684.06 MB
+12-08 01:18 - Starting categorical encoding
+12-08 01:18 - Using chunk size of 50000 for categorical encoding
+12-08 01:18 - Processing column: Gender
+12-08 01:18 - Memory usage: 1696.78 MB
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 01:18 - Memory usage: 1710.88 MB
+12-08 01:18 - Processing column: Unit1
+12-08 01:18 - Memory usage: 1710.88 MB
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 01:18 - Memory usage: 1717.61 MB
+12-08 01:18 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_encoded_val.parquet
+12-08 01:18 - Encoding test data...
+12-08 01:18 - Memory usage: 1705.42 MB
+12-08 01:18 - Starting categorical encoding
+12-08 01:18 - Using chunk size of 50000 for categorical encoding
+12-08 01:18 - Processing column: Gender
+12-08 01:18 - Memory usage: 1747.31 MB
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 01:18 - Memory usage: 1759.39 MB
+12-08 01:18 - Processing column: Unit1
+12-08 01:18 - Memory usage: 1759.39 MB
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 01:18 - Memory usage: 1769.58 MB
+12-08 01:18 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_encoded_test.parquet
+12-08 01:18 - Scaling numeric features
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_final_train.parquet
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_final_val.parquet
+12-08 01:18 - Saved checkpoint to checkpoints/checkpoint_final_test.parquet
+12-08 01:18 - Scaled numeric features. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Scaled numeric features for validation set. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Scaled numeric features for test set. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Training set features after encoding: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Validation set features after encoding: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Test set features after encoding: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Training data features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Validation data features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Test data features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:18 - Applying SMOTEENN to training data
+12-08 01:29 - An error occurred: local variable 'randint' referenced before assignment
+Traceback (most recent call last):
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/main.py", line 224, in main
+    "random_forest__n_estimators": randint(100, 500),
+UnboundLocalError: local variable 'randint' referenced before assignment
+12-08 01:36 - Starting Sepsis Prediction Pipeline
+12-08 01:36 - Loading raw data
+12-08 01:36 - Loaded dataset with 1552210 rows and 44 columns
+12-08 01:36 - Splitting data into training, validation, and testing sets
+12-08 01:36 - 
+Data Split Summary:
+12-08 01:36 - --------------------------------------------------
+12-08 01:36 - Training set:   1086116 rows, 28234 unique patients
+12-08 01:36 - Validation set: 234530 rows, 6049 unique patients
+12-08 01:36 - Testing set:    231564 rows, 6053 unique patients
+12-08 01:36 - Training set sepsis rate: 7.3%
+12-08 01:36 - Validation set sepsis rate: 7.3%
+12-08 01:36 - Testing set sepsis rate: 7.3%
+12-08 01:36 - Analyzing and dropping columns in training set
+12-08 01:36 - Dropped columns due to high missing rates: {'Bilirubin_direct', 'Lactate', 'EtCO2', 'SaO2', 'HCO3', 'Alkalinephos', 'Bilirubin_total', 'PTT', 'Phosphate', 'Fibrinogen', 'Chloride', 'TroponinI', 'AST'}
+12-08 01:36 - Dropped columns due to high correlation: {'Bilirubin_direct', 'Unit2', 'Hgb', 'ICULOS'}
+12-08 01:36 - Dropped columns due to clinical redundancy: {'Bilirubin_direct', 'HCO3', 'SaO2', 'BaseExcess'}
+12-08 01:36 - 
+Retained 26/44 columns (59.1%)
+12-08 01:36 - Dropped the same columns from validation and test sets to maintain consistency.
+12-08 01:36 - Columns dropped from all datasets: ['Unnamed: 0', 'EtCO2', 'HCO3', 'SaO2', 'AST', 'Alkalinephos', 'Chloride', 'Bilirubin_direct', 'Lactate', 'Phosphate', 'Bilirubin_total', 'TroponinI', 'PTT', 'Fibrinogen', 'Bilirubin_direct', 'Hgb', 'Unit2', 'ICULOS', 'HCO3', 'BaseExcess', 'SaO2', 'Bilirubin_direct']
+12-08 01:36 - Preprocessing all datasets
+12-08 01:36 - Starting preprocessing pipeline
+12-08 01:36 - Memory usage: 1210.92 MB
+12-08 01:36 - Using 10 parallel jobs
+12-08 01:36 - Analyzing and dropping columns
+12-08 01:36 - Dropped columns due to high missing rates: set()
+12-08 01:36 - Dropped columns due to high correlation: set()
+12-08 01:36 - Dropped columns due to clinical redundancy: set()
+12-08 01:36 - 
+Retained 26/26 columns (100.0%)
+12-08 01:36 - Saved checkpoint to checkpoints/checkpoint_after_column_analysis.parquet
+12-08 01:36 - Creating basic features
+12-08 01:37 - Saved checkpoint to checkpoints/checkpoint_basic_features_0.parquet
+12-08 01:37 - Saved checkpoint to checkpoints/checkpoint_basic_features_1.parquet
+12-08 01:37 - Saved checkpoint to checkpoints/checkpoint_basic_features_2.parquet
+12-08 01:37 - Memory usage: 1112.78 MB
+12-08 01:37 - Handling missing values
+12-08 01:37 - Starting Iterative Imputer on the entire dataset
+12-08 01:42 - Imputation completed successfully
+12-08 01:42 - Starting Iterative Imputer on the entire dataset
+12-08 01:43 - Imputation completed successfully
+12-08 01:43 - Starting Iterative Imputer on the entire dataset
+12-08 01:44 - Imputation completed successfully
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_after_missing_values.parquet
+12-08 01:44 - Memory usage: 1223.84 MB
+12-08 01:44 - Calculating severity scores
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_after_severity_scores.parquet
+12-08 01:44 - Memory usage: 1359.17 MB
+12-08 01:44 - Starting categorical encoding process
+12-08 01:44 - Encoding training data...
+12-08 01:44 - Memory usage: 1359.17 MB
+12-08 01:44 - Starting categorical encoding
+12-08 01:44 - Using chunk size of 50000 for categorical encoding
+12-08 01:44 - Processing column: Gender
+12-08 01:44 - Memory usage: 1807.95 MB
+12-08 01:44 - Found 2 categories for Gender
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 01:44 - Memory usage: 1801.59 MB
+12-08 01:44 - Processing column: Unit1
+12-08 01:44 - Memory usage: 1801.59 MB
+12-08 01:44 - Found 2 categories for Unit1
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 01:44 - Memory usage: 1491.94 MB
+12-08 01:44 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_encoded_train.parquet
+12-08 01:44 - Encoding validation data...
+12-08 01:44 - Memory usage: 1269.23 MB
+12-08 01:44 - Starting categorical encoding
+12-08 01:44 - Using chunk size of 50000 for categorical encoding
+12-08 01:44 - Processing column: Gender
+12-08 01:44 - Memory usage: 1393.56 MB
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 01:44 - Memory usage: 1408.34 MB
+12-08 01:44 - Processing column: Unit1
+12-08 01:44 - Memory usage: 1408.34 MB
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 01:44 - Memory usage: 1410.19 MB
+12-08 01:44 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_encoded_val.parquet
+12-08 01:44 - Encoding test data...
+12-08 01:44 - Memory usage: 1398.05 MB
+12-08 01:44 - Starting categorical encoding
+12-08 01:44 - Using chunk size of 50000 for categorical encoding
+12-08 01:44 - Processing column: Gender
+12-08 01:44 - Memory usage: 1492.41 MB
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 01:44 - Memory usage: 1505.69 MB
+12-08 01:44 - Processing column: Unit1
+12-08 01:44 - Memory usage: 1505.69 MB
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 01:44 - Memory usage: 1506.53 MB
+12-08 01:44 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_encoded_test.parquet
+12-08 01:44 - Scaling numeric features
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_final_train.parquet
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_final_val.parquet
+12-08 01:44 - Saved checkpoint to checkpoints/checkpoint_final_test.parquet
+12-08 01:44 - Scaled numeric features. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Scaled numeric features for validation set. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Scaled numeric features for test set. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Training set features after encoding: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Validation set features after encoding: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Test set features after encoding: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Training data features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Validation data features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Test data features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 01:44 - Applying SMOTEENN to training data
+12-08 01:56 - Starting hyperparameter tuning for Random Forest (Tuned)
+12-08 06:05 - Best parameters found: {'random_forest__max_depth': None, 'random_forest__max_features': 'log2', 'random_forest__min_samples_leaf': 2, 'random_forest__min_samples_split': 3, 'random_forest__n_estimators': 364}
+12-08 06:05 - Best F1 from tuning: 0.9794
+12-08 06:05 - Hyperparameter tuning for Random Forest (Tuned) completed successfully.
+12-08 06:05 - 
+Training Naive Bayes...
+12-08 06:05 - 
+Training KNN...
+12-08 06:10 - 
+Training Logistic Regression...
+12-08 06:11 - Training XGBoost model
+12-08 06:11 - Starting hyperparameter tuning for XGBoost
+12-08 06:11 - Error in XGBoost training: DataFrame.dtypes for data must be int, float, bool or category. When categorical type is supplied, the experimental DMatrix parameter`enable_categorical` must be set to `True`.  Invalid columns:Patient_ID: object
+joblib.externals.loky.process_executor._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/externals/loky/process_executor.py", line 463, in _process_worker
+    r = call_item()
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/externals/loky/process_executor.py", line 291, in __call__
+    return self.fn(*self.args, **self.kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/parallel.py", line 598, in __call__
+    return [func(*args, **kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/parallel.py", line 598, in <listcomp>
+    return [func(*args, **kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/utils/parallel.py", line 136, in __call__
+    return self.function(*args, **kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/model_selection/_validation.py", line 888, in _fit_and_score
+    estimator.fit(X_train, y_train, **fit_params)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/base.py", line 1473, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/imblearn/pipeline.py", line 333, in fit
+    self._final_estimator.fit(Xt, yt, **last_step_params["fit"])
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 726, in inner_f
+    return func(**kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/sklearn.py", line 1512, in fit
+    train_dmatrix, evals = _wrap_evaluation_matrices(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/sklearn.py", line 596, in _wrap_evaluation_matrices
+    train_dmatrix = create_dmatrix(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/sklearn.py", line 1003, in _create_dmatrix
+    return QuantileDMatrix(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 726, in inner_f
+    return func(**kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 1573, in __init__
+    self._init(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 1632, in _init
+    it.reraise()
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 569, in reraise
+    raise exc  # pylint: disable=raising-bad-type
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 550, in _handle_exception
+    return fn()
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 637, in <lambda>
+    return self._handle_exception(lambda: self.next(input_data), 0)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/data.py", line 1402, in next
+    input_data(**self.kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 726, in inner_f
+    return func(**kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 617, in input_data
+    new, cat_codes, feature_names, feature_types = _proxy_transform(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/data.py", line 1447, in _proxy_transform
+    df, feature_names, feature_types = _transform_pandas_df(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/data.py", line 603, in _transform_pandas_df
+    pandas_check_dtypes(data, enable_categorical)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/data.py", line 569, in pandas_check_dtypes
+    _invalid_dataframe_dtype(data)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/data.py", line 356, in _invalid_dataframe_dtype
+    raise ValueError(msg)
+ValueError: DataFrame.dtypes for data must be int, float, bool or category. When categorical type is supplied, the experimental DMatrix parameter`enable_categorical` must be set to `True`.  Invalid columns:Patient_ID: object
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/main.py", line 413, in main
+    xgb_random_search.fit(X_train_resampled, y_train_resampled)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/base.py", line 1473, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/model_selection/_search.py", line 1019, in fit
+    self._run_search(evaluate_candidates)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/model_selection/_search.py", line 1960, in _run_search
+    evaluate_candidates(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/model_selection/_search.py", line 965, in evaluate_candidates
+    out = parallel(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/sklearn/utils/parallel.py", line 74, in __call__
+    return super().__call__(iterable_with_config)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/parallel.py", line 2007, in __call__
+    return output if self.return_generator else list(output)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/parallel.py", line 1650, in _get_outputs
+    yield from self._retrieve()
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/parallel.py", line 1754, in _retrieve
+    self._raise_error_fast()
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/parallel.py", line 1789, in _raise_error_fast
+    error_job.get_result(self.timeout)
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/parallel.py", line 745, in get_result
+    return self._return_or_raise()
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/joblib/parallel.py", line 763, in _return_or_raise
+    raise self._result
+ValueError: DataFrame.dtypes for data must be int, float, bool or category. When categorical type is supplied, the experimental DMatrix parameter`enable_categorical` must be set to `True`.  Invalid columns:Patient_ID: object
+12-08 06:11 - 
+Performing final evaluation with best model: Naive Bayes
+12-08 06:11 - Saving the best model (Naive Bayes)
+12-08 06:11 - Model saved to models/best_model_naive bayes.pkl
+12-08 06:11 - Sepsis Prediction Pipeline completed successfully.
+12-08 11:40 - Starting Sepsis Prediction Pipeline
+12-08 11:40 - Loading raw data
+12-08 11:40 - Loaded dataset with 1552210 rows and 44 columns
+12-08 11:40 - Splitting data into training, validation, and testing sets
+12-08 11:40 - 
+Data Split Summary:
+12-08 11:40 - --------------------------------------------------
+12-08 11:40 - Training set:   1086116 rows, 28234 unique patients
+12-08 11:40 - Validation set: 234530 rows, 6049 unique patients
+12-08 11:40 - Testing set:    231564 rows, 6053 unique patients
+12-08 11:40 - Training set sepsis rate: 7.3%
+12-08 11:40 - Validation set sepsis rate: 7.3%
+12-08 11:40 - Testing set sepsis rate: 7.3%
+12-08 11:40 - Analyzing and dropping columns in training set
+12-08 11:40 - Dropped columns due to high missing rates: {'Bilirubin_direct', 'HCO3', 'EtCO2', 'Phosphate', 'TroponinI', 'PTT', 'Chloride', 'Fibrinogen', 'Lactate', 'AST', 'Bilirubin_total', 'SaO2', 'Alkalinephos'}
+12-08 11:40 - Dropped columns due to high correlation: {'ICULOS', 'Hgb', 'Bilirubin_direct', 'Unit2'}
+12-08 11:40 - Dropped columns due to clinical redundancy: {'BaseExcess', 'Bilirubin_direct', 'SaO2', 'HCO3'}
+12-08 11:40 - 
+Retained 26/44 columns (59.1%)
+12-08 11:40 - Dropped the same columns from validation and test sets to maintain consistency.
+12-08 11:40 - Columns dropped from all datasets: ['Unnamed: 0', 'EtCO2', 'HCO3', 'SaO2', 'AST', 'Alkalinephos', 'Chloride', 'Bilirubin_direct', 'Lactate', 'Phosphate', 'Bilirubin_total', 'TroponinI', 'PTT', 'Fibrinogen', 'Bilirubin_direct', 'Hgb', 'Unit2', 'ICULOS', 'HCO3', 'BaseExcess', 'SaO2', 'Bilirubin_direct']
+12-08 11:40 - Preprocessing all datasets
+12-08 11:40 - Starting preprocessing pipeline
+12-08 11:40 - Memory usage: 1450.61 MB
+12-08 11:40 - Using 10 parallel jobs
+12-08 11:40 - Analyzing and dropping columns
+12-08 11:40 - Dropped columns due to high missing rates: set()
+12-08 11:40 - Dropped columns due to high correlation: set()
+12-08 11:40 - Dropped columns due to clinical redundancy: set()
+12-08 11:40 - 
+Retained 26/26 columns (100.0%)
+12-08 11:40 - Saved checkpoint to checkpoints/checkpoint_after_column_analysis.parquet
+12-08 11:40 - Creating basic features
+12-08 11:41 - Saved checkpoint to checkpoints/checkpoint_basic_features_0.parquet
+12-08 11:41 - Saved checkpoint to checkpoints/checkpoint_basic_features_1.parquet
+12-08 11:41 - Saved checkpoint to checkpoints/checkpoint_basic_features_2.parquet
+12-08 11:41 - Memory usage: 2441.30 MB
+12-08 11:41 - Handling missing values
+12-08 11:41 - Starting Iterative Imputer on the entire dataset
+12-08 11:46 - Imputation completed successfully
+12-08 11:46 - Starting Iterative Imputer on the entire dataset
+12-08 11:46 - Imputation completed successfully
+12-08 11:47 - Starting Iterative Imputer on the entire dataset
+12-08 11:47 - Imputation completed successfully
+12-08 11:47 - Saved checkpoint to checkpoints/checkpoint_after_missing_values.parquet
+12-08 11:47 - Memory usage: 1842.69 MB
+12-08 11:47 - Calculating severity scores
+12-08 11:47 - Saved checkpoint to checkpoints/checkpoint_after_severity_scores.parquet
+12-08 11:47 - Memory usage: 1663.56 MB
+12-08 11:47 - Starting categorical encoding process
+12-08 11:47 - Encoding training data...
+12-08 11:47 - Memory usage: 1663.56 MB
+12-08 11:47 - Starting categorical encoding
+12-08 11:47 - Using chunk size of 50000 for categorical encoding
+12-08 11:47 - Processing column: Gender
+12-08 11:47 - Memory usage: 2115.36 MB
+12-08 11:47 - Found 2 categories for Gender
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 11:48 - Memory usage: 2113.50 MB
+12-08 11:48 - Processing column: Unit1
+12-08 11:48 - Memory usage: 2113.50 MB
+12-08 11:48 - Found 2 categories for Unit1
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 11:48 - Memory usage: 2123.83 MB
+12-08 11:48 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_encoded_train.parquet
+12-08 11:48 - Encoding validation data...
+12-08 11:48 - Memory usage: 1860.97 MB
+12-08 11:48 - Starting categorical encoding
+12-08 11:48 - Using chunk size of 50000 for categorical encoding
+12-08 11:48 - Processing column: Gender
+12-08 11:48 - Memory usage: 1860.34 MB
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 11:48 - Memory usage: 1872.45 MB
+12-08 11:48 - Processing column: Unit1
+12-08 11:48 - Memory usage: 1872.45 MB
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 11:48 - Memory usage: 1876.09 MB
+12-08 11:48 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_encoded_val.parquet
+12-08 11:48 - Encoding test data...
+12-08 11:48 - Memory usage: 1861.08 MB
+12-08 11:48 - Starting categorical encoding
+12-08 11:48 - Using chunk size of 50000 for categorical encoding
+12-08 11:48 - Processing column: Gender
+12-08 11:48 - Memory usage: 1882.28 MB
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_encoded_Gender.parquet
+12-08 11:48 - Memory usage: 1893.67 MB
+12-08 11:48 - Processing column: Unit1
+12-08 11:48 - Memory usage: 1893.67 MB
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_encoded_Unit1.parquet
+12-08 11:48 - Memory usage: 1898.03 MB
+12-08 11:48 - Encoded categorical columns. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'Patient_ID', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_encoded_test.parquet
+12-08 11:48 - Scaling numeric features
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_final_train.parquet
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_final_val.parquet
+12-08 11:48 - Saved checkpoint to checkpoints/checkpoint_final_test.parquet
+12-08 11:48 - Dropping 'Patient_ID' from all datasets
+12-08 11:48 - Dropped 'Patient_ID' from dataset
+12-08 11:48 - Dropped 'Patient_ID' from dataset
+12-08 11:48 - Dropped 'Patient_ID' from dataset
+12-08 11:48 - Scaled numeric features. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Scaled numeric features for validation set. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Scaled numeric features for test set. Current features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Training set features after encoding: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Validation set features after encoding: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Test set features after encoding: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'SepsisLabel', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Training data features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Validation data features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Test data features: ['Hour', 'HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'FiO2', 'pH', 'PaCO2', 'BUN', 'Calcium', 'Creatinine', 'Glucose', 'Magnesium', 'Potassium', 'Hct', 'WBC', 'Platelets', 'Age', 'HospAdmTime', 'BUN_missing', 'Creatinine_missing', 'Glucose_missing', 'WBC_missing', 'Platelets_missing', 'shock_index', 'pulse_pressure', 'HR_rate', 'O2Sat_rate', 'Temp_rate', 'MAP_rate', 'Resp_rate', 'sirs_temp', 'sirs_hr', 'sirs_resp', 'sirs_wbc', 'sirs_score', 'Gender_0.0', 'Gender_1.0', 'Gender_Unknown', 'Unit1_0', 'Unit1_1', 'Unit1_Unknown']
+12-08 11:48 - Applying SMOTEENN to training data
+12-08 11:58 - 'Patient_ID' successfully excluded from resampled training data.
+12-08 11:58 - 'Patient_ID' successfully excluded from validation data.
+12-08 11:58 - 'Patient_ID' successfully excluded from test data.
+12-08 11:59 - Starting hyperparameter tuning for Random Forest (Tuned)
+12-08 14:01 - Best parameters found: {'random_forest__max_depth': 25, 'random_forest__max_features': 'sqrt', 'random_forest__min_samples_leaf': 2, 'random_forest__min_samples_split': 4, 'random_forest__n_estimators': 314}
+12-08 14:01 - Best F1 from tuning: 0.9595
+12-08 14:01 - Hyperparameter tuning for Random Forest (Tuned) completed successfully.
+12-08 14:01 - 
+Training Naive Bayes...
+12-08 14:01 - 
+Training KNN...
+12-08 14:05 - 
+Training Logistic Regression...
+12-08 14:06 - Training XGBoost model
+12-08 14:06 - Starting hyperparameter tuning for XGBoost
+12-08 14:14 - Best parameters found for XGBoost: {'xgboost__colsample_bytree': 0.8950877702656028, 'xgboost__gamma': 3.029799873905057, 'xgboost__learning_rate': 0.2878902635540047, 'xgboost__max_depth': 12, 'xgboost__n_estimators': 140, 'xgboost__subsample': 0.9574798377718904}
+12-08 14:14 - Best F1 Score from tuning XGBoost: 0.9669
+12-08 14:14 - Hyperparameter tuning for XGBoost completed successfully.
+12-08 14:14 - 
+Performing final evaluation with best model: XGBoost
+12-08 14:14 - Saving the best model (XGBoost)
+12-08 14:14 - Model saved to models/best_model_xgboost.pkl
+12-08 14:14 - Sepsis Prediction Pipeline completed successfully.
+2024-12-08 14:44:29,787 - INFO - Starting Sepsis Prediction Pipeline
+2024-12-08 14:44:29,787 - INFO - Loading raw data
+2024-12-08 14:44:31,572 - INFO - Splitting data into training, validation, and testing sets
+2024-12-08 14:44:45,938 - INFO - Preprocessing all datasets
+2024-12-08 14:53:30,208 - INFO - Starting Sepsis Prediction Pipeline
+2024-12-08 14:53:30,208 - INFO - Loading raw data
+2024-12-08 14:53:31,873 - INFO - Splitting data into training, validation, and testing sets
+2024-12-08 14:53:46,502 - INFO - Preprocessing all datasets
+2024-12-08 14:57:35,866 - INFO - Applying SMOTEENN to training data
+2024-12-08 15:00:30,154 - INFO - Starting hyperparameter tuning for Random Forest
+2024-12-08 19:23:10,321 - INFO - Best parameters found: {'random_forest__max_depth': 30, 'random_forest__max_features': 'log2', 'random_forest__min_samples_leaf': 1, 'random_forest__min_samples_split': 2, 'random_forest__n_estimators': 484}
+2024-12-08 19:23:10,325 - INFO - Best F1 Score from tuning: 0.9911
+2024-12-08 19:23:12,220 - INFO - 
+random_forest_tuned Evaluation:
+2024-12-08 19:23:12,220 - INFO -   Accuracy                  : 0.9766
+2024-12-08 19:23:12,220 - INFO -   Precision                 : 0.3527
+2024-12-08 19:23:12,220 - INFO -   Recall                    : 0.5162
+2024-12-08 19:23:12,220 - INFO -   F1 Score                  : 0.4190
+2024-12-08 19:23:12,220 - INFO -   Mean Absolute Error       : 0.0234
+2024-12-08 19:23:12,220 - INFO -   Root Mean Squared Error   : 0.1530
+2024-12-08 19:23:12,220 - INFO -   AUC-ROC                   : 0.9550
+2024-12-08 19:23:12,745 - WARNING - Feature importances not available for random_forest_tuned: Model does not have feature_importances_ attribute.
+2024-12-08 19:23:12,746 - INFO - Saved evaluation metrics to reports/evaluations/random_forest_tuned_metrics.json
+
+2024-12-08 19:23:12,747 - INFO - Hyperparameter tuning for Random Forest completed successfully.
+2024-12-08 19:23:12,893 - INFO - Starting hyperparameter tuning for Naive Bayes
+2024-12-08 19:23:24,279 - INFO - Best NB parameters: {'naive_bayes__var_smoothing': 5.722367659350221e-10, 'naive_bayes__priors': [0.5, 0.5]}
+2024-12-08 19:23:24,280 - INFO - Best NB F1 score: 0.5528
+2024-12-08 19:23:24,477 - INFO - 
+naive_bayes_tuned Evaluation:
+2024-12-08 19:23:24,477 - INFO -   Accuracy                  : 0.8864
+2024-12-08 19:23:24,477 - INFO -   Precision                 : 0.0697
+2024-12-08 19:23:24,477 - INFO -   Recall                    : 0.4821
+2024-12-08 19:23:24,477 - INFO -   F1 Score                  : 0.1218
+2024-12-08 19:23:24,477 - INFO -   Mean Absolute Error       : 0.1136
+2024-12-08 19:23:24,477 - INFO -   Root Mean Squared Error   : 0.3370
+2024-12-08 19:23:24,477 - INFO -   AUC-ROC                   : 0.7887
+2024-12-08 19:23:24,954 - WARNING - Feature importances not available for naive_bayes_tuned: Model does not have feature_importances_ attribute.
+2024-12-08 19:23:24,954 - INFO - Saved evaluation metrics to reports/evaluations/naive_bayes_tuned_metrics.json
+
+2024-12-08 19:23:25,000 - INFO - Starting hyperparameter tuning for KNN
+2024-12-09 14:29:34,190 - INFO - Best KNN parameters: {'knn__algorithm': 'auto', 'knn__leaf_size': 38, 'knn__n_neighbors': 4, 'knn__p': 1, 'knn__weights': 'distance'}
+2024-12-09 14:29:34,192 - INFO - Best KNN F1 score: 0.9766
+2024-12-09 14:34:25,193 - INFO - 
+knn_tuned Evaluation:
+2024-12-09 14:34:25,193 - INFO -   Accuracy                  : 0.9704
+2024-12-09 14:34:25,193 - INFO -   Precision                 : 0.2263
+2024-12-09 14:34:25,193 - INFO -   Recall                    : 0.3359
+2024-12-09 14:34:25,193 - INFO -   F1 Score                  : 0.2704
+2024-12-09 14:34:25,193 - INFO -   Mean Absolute Error       : 0.0296
+2024-12-09 14:34:25,193 - INFO -   Root Mean Squared Error   : 0.1721
+2024-12-09 14:34:25,193 - INFO -   AUC-ROC                   : 0.7284
+2024-12-09 14:34:25,647 - WARNING - Feature importances not available for knn_tuned: Model does not have feature_importances_ attribute.
+2024-12-09 14:34:25,648 - INFO - Saved evaluation metrics to reports/evaluations/knn_tuned_metrics.json
+
+2024-12-09 14:34:25,697 - INFO - Starting hyperparameter tuning for Logistic Regression
+2024-12-09 16:17:58,846 - INFO - Best LR parameters: {'logistic_regression__C': 44.58427528535911, 'logistic_regression__class_weight': {0: 1, 1: 2}, 'logistic_regression__l1_ratio': 0.05808361216819946, 'logistic_regression__max_iter': 500, 'logistic_regression__penalty': 'elasticnet', 'logistic_regression__solver': 'saga', 'logistic_regression__tol': 0.0001}
+2024-12-09 16:17:58,847 - INFO - Best LR F1 score: 0.8654
+2024-12-09 16:17:59,019 - INFO - 
+logistic_regression_tuned Evaluation:
+2024-12-09 16:17:59,019 - INFO -   Accuracy                  : 0.9275
+2024-12-09 16:17:59,019 - INFO -   Precision                 : 0.1575
+2024-12-09 16:17:59,019 - INFO -   Recall                    : 0.7896
+2024-12-09 16:17:59,019 - INFO -   F1 Score                  : 0.2627
+2024-12-09 16:17:59,019 - INFO -   Mean Absolute Error       : 0.0725
+2024-12-09 16:17:59,019 - INFO -   Root Mean Squared Error   : 0.2692
+2024-12-09 16:17:59,019 - INFO -   AUC-ROC                   : 0.8900
+2024-12-09 16:17:59,496 - WARNING - Feature importances not available for logistic_regression_tuned: Model does not have feature_importances_ attribute.
+2024-12-09 16:17:59,497 - INFO - Saved evaluation metrics to reports/evaluations/logistic_regression_tuned_metrics.json
+
+2024-12-09 16:17:59,545 - INFO - Training XGBoost model
+2024-12-09 16:17:59,612 - ERROR - Error in XGBoost training: train() got an unexpected keyword argument 'xgb_params'
+Traceback (most recent call last):
+  File "/Users/jeremy/Documents/Development/sepsis_prediction/main1.py", line 420, in main
+    xgb_model = xgb.train(
+  File "/Users/jeremy/miniforge3/envs/predictsepsis/lib/python3.10/site-packages/xgboost/core.py", line 726, in inner_f
+    return func(**kwargs)
+TypeError: train() got an unexpected keyword argument 'xgb_params'
+2024-12-09 16:17:59,614 - INFO - 
+Performing final evaluation with best model: Random Forest (Tuned)
+2024-12-09 16:18:01,417 - INFO - 
+final_random forest (tuned) Evaluation:
+2024-12-09 16:18:01,417 - INFO -   Accuracy                  : 0.9875
+2024-12-09 16:18:01,417 - INFO -   Precision                 : 0.6388
+2024-12-09 16:18:01,417 - INFO -   Recall                    : 0.5125
+2024-12-09 16:18:01,417 - INFO -   F1 Score                  : 0.5687
+2024-12-09 16:18:01,417 - INFO -   Mean Absolute Error       : 0.0125
+2024-12-09 16:18:01,417 - INFO -   Root Mean Squared Error   : 0.1120
+2024-12-09 16:18:01,417 - INFO -   AUC-ROC                   : 0.9774
+2024-12-09 16:18:01,863 - WARNING - Feature importances not available for final_random forest (tuned): Model does not have feature_importances_ attribute.
+2024-12-09 16:18:01,865 - INFO - Saved evaluation metrics to reports/evaluations/final_random forest (tuned)_metrics.json
+
+2024-12-09 16:18:01,865 - INFO - Saving the best model (Random Forest (Tuned))
+2024-12-09 16:18:02,458 - INFO - Model saved to models/best_model_random forest (tuned).pkl
+2024-12-09 16:18:02,494 - INFO - Sepsis Prediction Pipeline completed successfully.

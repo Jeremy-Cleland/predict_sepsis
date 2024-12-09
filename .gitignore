@@ -3,7 +3,7 @@ __pycache__/
 .DS_Store
 .env
 venv/
-*.log
+# *.log
 
 lastrun.md
 record.md

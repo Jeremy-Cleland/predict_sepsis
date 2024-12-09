@@ -1,0 +1,4 @@
+{"asctime": "2024-12-08 01:55:17,950", "name": "sepsis_prediction.models", "levelname": "INFO", "message": "Training Logistic Regression"}
+{"asctime": "2024-12-08 01:56:17,388", "name": "sepsis_prediction.models", "levelname": "INFO", "message": "Logistic Regression training completed."}
+{"asctime": "2024-12-08 11:58:42,021", "name": "sepsis_prediction.models", "levelname": "INFO", "message": "Training Logistic Regression"}
+{"asctime": "2024-12-08 11:59:06,839", "name": "sepsis_prediction.models", "levelname": "INFO", "message": "Logistic Regression training completed."}
