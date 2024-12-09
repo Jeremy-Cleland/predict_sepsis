@@ -22,3 +22,10 @@ data/processed/val_data.csv
 data/processed/test_data.csv
 models/best_model_xgboost.pkl
 checkpoints
+
+models/best_model_random forest(tuned).pkl
+models/best_model_naive bayes.pkl
+
+models/best_model_random forest (tuned).pkl
+models/transformers/scaler.pkl
+models/transformers/categories.pkl
