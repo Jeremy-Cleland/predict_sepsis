@@ -18,13 +18,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
 
 from src import (
     evaluate_model,  # Import the updated unified evaluation function
     load_data,
     preprocess_data,
     split_data,
-    train_logistic_regression,
 )
 from src.evaluation import plot_class_distribution, plot_feature_correlation_heatmap
 from src.utils import setup_logger
@@ -125,8 +125,11 @@ def main():
 
         logger.info("Applying SMOTEENN to training data")
         smote_enn = SMOTEENN(
-            smote=SMOTE(sampling_strategy=0.3, random_state=42, k_neighbors=5),
-            enn=EditedNearestNeighbours(n_jobs=-1),
+            smote=SMOTE(sampling_strategy=0.4, random_state=42, k_neighbors=6),
+            enn=EditedNearestNeighbours(
+                n_jobs=-1,
+                n_neighbors=3,
+            ),
             random_state=42,
         )
         X_train_resampled, y_train_resampled = smote_enn.fit_resample(X_train, y_train)
@@ -168,7 +171,7 @@ def main():
             "random_forest__max_depth": [None] + list(range(10, 31, 5)),
             "random_forest__min_samples_split": randint(2, 11),
             "random_forest__min_samples_leaf": randint(1, 5),
-            "random_forest__max_features": ["auto", "sqrt", "log2"],
+            "random_forest__max_features": ["sqrt", "log2", None],
         }
 
         # Initialize RandomizedSearchCV
@@ -218,109 +221,185 @@ def main():
 
         logger.info("Hyperparameter tuning for Random Forest completed successfully.")
 
-        # # 5.1 Random Forest
-        # rf_pipeline = ImbPipeline(
-        #     [
-        #         ("scaler", StandardScaler()),
-        #         (
-        #             "random_forest",
-        #             RandomForestClassifier(
-        #                 n_estimators=100,
-        #                 max_depth=20,
-        #                 random_state=42,
-        #                 class_weight="balanced",
-        #                 n_jobs=-1,
-        #             ),
-        #         ),
-        #     ]
-        # )
-        # score, models["Random Forest"] = train_and_evaluate_model(
-        #     "Random Forest",
-        #     rf_pipeline,
-        #     X_train_resampled,
-        #     y_train_resampled,
-        #     X_val,
-        #     y_val,
-        #     logger,
-        # )
-        # if score > best_score:
-        #     best_score = score
-        #     best_model_name = "Random Forest"
-
         del rf_pipeline
         gc.collect()
 
-        # 5.2 Naive Bayes
+        # 5.2 Naive Bayes with optimization
         nb_pipeline = ImbPipeline(
-            [
-                ("scaler", StandardScaler()),
-                ("naive_bayes", GaussianNB()),
-            ]
+            [("scaler", StandardScaler()), ("naive_bayes", GaussianNB())]
         )
-        score, models["Naive Bayes"] = train_and_evaluate_model(
-            "Naive Bayes",
-            nb_pipeline,
-            X_train_resampled,
-            y_train_resampled,
-            X_val,
-            y_val,
-            logger,
-        )
-        if score > best_score:
-            best_score = score
-            best_model_name = "Naive Bayes"
 
-        del nb_pipeline
+        nb_param_dist = {
+            "naive_bayes__var_smoothing": np.logspace(-11, -5, 100),
+            "naive_bayes__priors": [None, [0.7, 0.3], [0.6, 0.4], [0.5, 0.5]],
+        }
+
+        nb_random_search = RandomizedSearchCV(
+            estimator=nb_pipeline,
+            param_distributions=nb_param_dist,
+            n_iter=20,
+            scoring="f1",
+            cv=5,
+            verbose=2,
+            random_state=42,
+            n_jobs=-1,
+        )
+
+        logger.info("Starting hyperparameter tuning for Naive Bayes")
+        nb_random_search.fit(X_train_resampled, y_train_resampled)
+        logger.info(f"Best NB parameters: {nb_random_search.best_params_}")
+        logger.info(f"Best NB F1 score: {nb_random_search.best_score_:.4f}")
+
+        # Evaluate the best NB model
+        best_nb_model = nb_random_search.best_estimator_
+        y_pred = best_nb_model.predict(X_val)
+        y_pred_proba = best_nb_model.predict_proba(X_val)[:, 1]
+
+        metrics = evaluate_model(
+            y_true=y_val,
+            y_pred=y_pred,
+            model_name="naive_bayes_tuned",
+            y_pred_proba=y_pred_proba,
+            model=best_nb_model,
+        )
+
+        if metrics["F1 Score"] > best_score:
+            best_score = metrics["F1 Score"]
+            best_model_name = "Naive Bayes (Tuned)"
+            models["Naive Bayes (Tuned)"] = best_nb_model
+
+        # Save NB parameters
+        with open(
+            os.path.join("reports/evaluations", "naive_bayes_tuned_params.json"), "w"
+        ) as f:
+            json.dump(nb_random_search.best_params_, f, indent=4)
+
+        del nb_pipeline, nb_random_search
         gc.collect()
 
-        # 5.3 KNN
+        # 5.3 KNN with optimization
         knn_pipeline = ImbPipeline(
-            [
-                ("scaler", StandardScaler()),
-                (
-                    "knn",
-                    KNeighborsClassifier(
-                        n_neighbors=5, weights="distance", algorithm="auto", n_jobs=-1
-                    ),
-                ),
-            ]
+            [("scaler", StandardScaler()), ("knn", KNeighborsClassifier(n_jobs=-1))]
         )
-        score, models["KNN"] = train_and_evaluate_model(
-            "KNN",
-            knn_pipeline,
-            X_train_resampled,
-            y_train_resampled,
-            X_val,
-            y_val,
-            logger,
-        )
-        if score > best_score:
-            best_score = score
-            best_model_name = "KNN"
 
-        del knn_pipeline
+        knn_param_dist = {
+            "knn__n_neighbors": randint(3, 20),
+            "knn__weights": ["uniform", "distance"],
+            "knn__algorithm": ["auto", "ball_tree", "kd_tree"],
+            "knn__leaf_size": randint(20, 50),
+            "knn__p": [1, 2],
+        }
+
+        knn_random_search = RandomizedSearchCV(
+            estimator=knn_pipeline,
+            param_distributions=knn_param_dist,
+            n_iter=50,
+            scoring="f1",
+            cv=5,
+            verbose=2,
+            random_state=42,
+            n_jobs=-1,
+        )
+
+        logger.info("Starting hyperparameter tuning for KNN")
+        knn_random_search.fit(X_train_resampled, y_train_resampled)
+        logger.info(f"Best KNN parameters: {knn_random_search.best_params_}")
+        logger.info(f"Best KNN F1 score: {knn_random_search.best_score_:.4f}")
+
+        # Evaluate the best KNN model
+        best_knn_model = knn_random_search.best_estimator_
+        y_pred = best_knn_model.predict(X_val)
+        y_pred_proba = best_knn_model.predict_proba(X_val)[:, 1]
+
+        metrics = evaluate_model(
+            y_true=y_val,
+            y_pred=y_pred,
+            model_name="knn_tuned",
+            y_pred_proba=y_pred_proba,
+            model=best_knn_model,
+        )
+
+        if metrics["F1 Score"] > best_score:
+            best_score = metrics["F1 Score"]
+            best_model_name = "KNN (Tuned)"
+            models["KNN (Tuned)"] = best_knn_model
+
+        # Save KNN parameters
+        with open(
+            os.path.join("reports/evaluations", "knn_tuned_params.json"), "w"
+        ) as f:
+            json.dump(knn_random_search.best_params_, f, indent=4)
+
+        del knn_pipeline, knn_random_search
         gc.collect()
 
-        # 5.4 Logistic Regression
-        lr_model = train_logistic_regression(X_train_resampled, y_train_resampled)
+        # 5.4 Logistic Regression with optimization
         lr_pipeline = ImbPipeline(
-            [("scaler", StandardScaler()), ("logistic_regression", lr_model)]
+            [
+                ("scaler", StandardScaler()),
+                ("logistic_regression", LogisticRegression(random_state=42)),
+            ]
         )
-        score, models["Logistic Regression"] = train_and_evaluate_model(
-            "Logistic Regression",
-            lr_pipeline,
-            X_train_resampled,
-            y_train_resampled,
-            X_val,
-            y_val,
-            logger,
-        )
-        if score > best_score:
-            best_score = score
-            best_model_name = "Logistic Regression"
 
-        # After training Logistic Regression, delete the pipeline and collect garbage
-        del lr_pipeline
+        lr_param_dist = {
+            "logistic_regression__C": uniform(0.001, 100),
+            "logistic_regression__penalty": ["l1", "l2", "elasticnet"],
+            "logistic_regression__solver": ["saga"],
+            "logistic_regression__l1_ratio": uniform(0, 1),
+            "logistic_regression__max_iter": [500, 1000, 1500],
+            "logistic_regression__class_weight": [
+                "balanced",
+                None,
+                {0: 1, 1: 2},
+                {0: 1, 1: 3},
+            ],
+            "logistic_regression__tol": [1e-5, 1e-4, 1e-3],
+        }
+
+        lr_random_search = RandomizedSearchCV(
+            estimator=lr_pipeline,
+            param_distributions=lr_param_dist,
+            n_iter=50,
+            scoring="f1",
+            cv=5,
+            verbose=2,
+            random_state=42,
+            n_jobs=-1,
+        )
+
+        logger.info("Starting hyperparameter tuning for Logistic Regression")
+        lr_random_search.fit(X_train_resampled, y_train_resampled)
+        logger.info(f"Best LR parameters: {lr_random_search.best_params_}")
+        logger.info(f"Best LR F1 score: {lr_random_search.best_score_:.4f}")
+
+        # Evaluate the best LR model
+        best_lr_model = lr_random_search.best_estimator_
+        y_pred = best_lr_model.predict(X_val)
+        y_pred_proba = best_lr_model.predict_proba(X_val)[:, 1]
+
+        metrics = evaluate_model(
+            y_true=y_val,
+            y_pred=y_pred,
+            model_name="logistic_regression_tuned",
+            y_pred_proba=y_pred_proba,
+            model=best_lr_model,
+        )
+
+        if metrics["F1 Score"] > best_score:
+            best_score = metrics["F1 Score"]
+            best_model_name = "Logistic Regression (Tuned)"
+            models["Logistic Regression (Tuned)"] = best_lr_model
+
+        # Save LR parameters
+        with open(
+            os.path.join(
+                "reports/evaluations", "logistic_regression_tuned_params.json"
+            ),
+            "w",
+        ) as f:
+            json.dump(lr_random_search.best_params_, f, indent=4)
+
+        del lr_pipeline, lr_random_search
         gc.collect()
 
         # 5.5 XGBoost
@@ -339,10 +418,10 @@ def main():
 
             # Train XGBoost model
             xgb_model = xgb.train(
-                params={
-                    "max_depth": 6,
+                xgb_params={
+                    "max_depth": 8,  # Increased from 6
                     "min_child_weight": 1,
-                    "eta": 0.05,
+                    "eta": 0.03,  # Decreased from 0.05
                     "subsample": 0.8,
                     "colsample_bytree": 0.8,
                     "objective": "binary:logistic",
@@ -350,10 +429,11 @@ def main():
                     "tree_method": "hist",
                     "alpha": 1,
                     "lambda": 1,
+                    "gamma": 0.1,  # Added gamma parameter
                     "random_state": 42,
                 },
                 dtrain=dtrain,
-                num_boost_round=200,
+                num_boost_round=500,  # Increased from 200
                 evals=[(dtrain, "train"), (dval, "eval")],
                 early_stopping_rounds=20,
                 verbose_eval=False,

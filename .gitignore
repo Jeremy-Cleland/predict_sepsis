@@ -21,3 +21,4 @@ models/best_model_xgboost.pkl
 data/processed/val_data.csv
 data/processed/test_data.csv
 models/best_model_xgboost.pkl
+checkpoints
