@@ -31,7 +31,7 @@ from src.logger_config import setup_logger
 logger = setup_logger(
     name="sepsis_prediction.evaluation",
     log_file="logs/evaluation.log",
-    use_json=True,
+    use_json=True,  # Ensure JSON logging is enabled
 )
 
 

@@ -1,0 +1,8 @@
+{
+    "xgboost__colsample_bytree": 0.5061753482887408,
+    "xgboost__gamma": 2.909729556485983,
+    "xgboost__learning_rate": 0.17648852816008437,
+    "xgboost__max_depth": 8,
+    "xgboost__n_estimators": 229,
+    "xgboost__subsample": 0.5545474901621302
+}

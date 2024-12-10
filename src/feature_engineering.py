@@ -146,6 +146,35 @@ def analyze_and_drop_columns(df, missing_threshold=0.98, correlation_threshold=0
     return df, dropped_columns
 
 
+def engineer_interaction_features(df):
+    """Create interaction features between vital signs."""
+    df = df.copy()
+
+    vital_signs = ["HR", "Temp", "MAP", "Resp"]
+
+    for i in range(len(vital_signs)):
+        for j in range(i + 1, len(vital_signs)):
+            col1 = vital_signs[i]
+            col2 = vital_signs[j]
+            interaction_col = f"{col1}_x_{col2}"
+            df[interaction_col] = df[col1] * df[col2]
+            logger.info(f"Created interaction feature: {interaction_col}")
+
+    return df
+
+
+def engineer_temporal_features(df):
+    """Create temporal features based on time trends."""
+    df = df.copy()
+
+    # Assuming 'Hour' represents time since admission
+    df["hour_squared"] = df["Hour"] ** 2
+    df["hour_log"] = np.log1p(df["Hour"])
+    logger.info("Created temporal features: hour_squared, hour_log")
+
+    return df
+
+
 def calculate_severity_scores(df):
     """Calculate clinical severity scores."""
     df = df.copy()
@@ -651,7 +680,7 @@ def preprocess_pipeline(
     n_jobs: int = -1,
 ) -> Tuple[pd.DataFrame, Optional[pd.DataFrame], Optional[pd.DataFrame]]:
     """
-    Complete preprocessing pipeline with fixed missing value handling.
+    Complete preprocessing pipeline with fixed missing value handling and advanced feature engineering.
     """
     try:
         n_jobs = -1
@@ -762,6 +791,61 @@ def preprocess_pipeline(
                 log_dataframe_info(logger, val_df, "Processed Validation Set")
             if test_df is not None:
                 log_dataframe_info(logger, test_df, "Processed Test Set")
+
+        # **4. Advanced Feature Engineering**
+        with log_step(logger, "Advanced Feature Engineering"):
+            logger.info("Starting Advanced Feature Engineering")
+            dfs = [train_df]
+            if val_df is not None:
+                dfs.append(val_df)
+            if test_df is not None:
+                dfs.append(test_df)
+
+            processed_dfs = []
+            for idx, df in enumerate(dfs):
+                try:
+                    # Apply Interaction Features
+                    df = engineer_interaction_features(df)
+                    logger.info(f"Applied Interaction Features for dataset {idx}")
+
+                    # Apply Temporal Features
+                    df = engineer_temporal_features(df)
+                    logger.info(f"Applied Temporal Features for dataset {idx}")
+
+                    # Append to list
+                    processed_dfs.append(df)
+
+                    # Save checkpoint
+                    save_checkpoint(df, f"advanced_features_{idx}")
+                    log_memory(
+                        logger, f"After Advanced Feature Engineering for dataset {idx}"
+                    )
+                    log_dataframe_info(
+                        logger,
+                        df,
+                        f"After Advanced Feature Engineering for dataset {idx}",
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Error in advanced feature engineering for dataset {idx}: {str(e)}"
+                    )
+                    raise
+
+            train_df = processed_dfs[0]
+            if val_df is not None:
+                val_df = processed_dfs[1]
+            if test_df is not None:
+                test_df = processed_dfs[2]
+
+            del processed_dfs
+            gc.collect()
+            logger.info("Advanced Feature Engineering completed.")
+            log_memory(logger, "After Advanced Feature Engineering")
+            log_dataframe_info(logger, train_df, "Advanced Features - Training Set")
+            if val_df is not None:
+                log_dataframe_info(logger, val_df, "Advanced Features - Validation Set")
+            if test_df is not None:
+                log_dataframe_info(logger, test_df, "Advanced Features - Test Set")
 
         # 4. Handle missing values
         with log_step(logger, "Handling Missing Values"):

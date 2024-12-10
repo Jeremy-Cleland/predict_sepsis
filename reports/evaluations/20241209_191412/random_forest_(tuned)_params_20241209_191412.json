@@ -1,0 +1,7 @@
+{
+    "random_forest__max_depth": 25,
+    "random_forest__max_features": "sqrt",
+    "random_forest__min_samples_leaf": 3,
+    "random_forest__min_samples_split": 3,
+    "random_forest__n_estimators": 174
+}
