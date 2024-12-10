@@ -28,7 +28,7 @@ from src.logging_utils import (
 logger = get_logger("sepsis_prediction.preprocessing")
 
 
-def analyze_and_drop_columns(df, missing_threshold=0.95, correlation_threshold=0.95):
+def analyze_and_drop_columns(df, missing_threshold=0.98, correlation_threshold=0.95):
     """
     Analyze and drop columns based on missing values, correlations, and clinical relevance.
 
